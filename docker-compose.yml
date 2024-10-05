@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13.5
+    container_name: pos_postgres_container
+    environment:
+      POSTGRES_USER: pos_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: pos_db
+    ports:
+      - "5431:5431"
+    volumes:
+      - pos_postgres:/var/lib/postgresql/data  
+    networks:
+      - backend_pos_network
+
+volumes: 
+  pos_postgres:  
+
+networks:
+  backend_pos_network:
