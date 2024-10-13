@@ -19,6 +19,6 @@ model User {
   name        String?
   password    String
   phoneNumber String?
-  role        String
+  role        String @default("shop")
   createdAt DateTime @default(now())
 }
