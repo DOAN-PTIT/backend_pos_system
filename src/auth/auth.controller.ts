@@ -5,13 +5,15 @@ import {
     Body,
     Post,
     HttpCode,
-    HttpStatus
+    HttpStatus,
+    UseGuards
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
 import { AuthEmailRegisterDto } from './dto/auth-email-register.dto'
 import { LoginResponseDto } from './dto/login-response.dto';
 import { Response, Request } from 'express';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -29,4 +31,19 @@ export class AuthController {
     public login(@Body() loginDto: AuthEmailLoginDto, @Res({ passthrough: true }) res: Response): Promise<LoginResponseDto> {
         return this.service.emailLogin(loginDto, res)
     }
+
+    @Post('refresh-token')
+    @HttpCode(HttpStatus.OK)
+    async refreshToken(@Req() req: Request): Promise<{ accessToken: string }> {
+
+        return await this.service.genAccessTokenByRefreshToken(req)
+    }
+
+    @UseGuards(AuthGuard)
+    @Post('logout')
+    @HttpCode(HttpStatus.OK)
+    async logout (@Res({passthrough: true}) res: Response) {
+        return await this.service.logout(res)
+    }
+
 }

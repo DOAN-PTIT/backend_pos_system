@@ -49,23 +49,26 @@ export class AuthService {
         return { accessToken, refreshToken };
     }
 
-    async genAccessTokenByRefreshToken (@Req() req: Request): Promise<string> {
+    async genAccessTokenByRefreshToken (@Req() req: Request): Promise<{accessToken: string}> {
         const refreshToken = req.cookies['refresh_token'];
 
         if (!refreshToken) {
             throw new UnauthorizedException('Refresh token not found, pls login again');
         }
 
-        let payload;
+        let payload: any;
         try {
             payload = await this.jwtService.verifyAsync(refreshToken, {
                 secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
             });
         } catch (error) {
-            throw new UnauthorizedException('Invalid or expired refresh token, pls login again');
+            if (error.name === 'TokenExpiredError') {
+                throw new UnauthorizedException('Login session has expired. Please login again');
+            }
+            throw new UnauthorizedException('Invalid refresh token. Please login again.');
         }
 
-        const userExists = await this.usersRepository.findUserById(payload.userId);
+        const userExists = await this.usersRepository.findUserById(payload.id);
 
         if (!userExists) {
             throw new BadRequestException('User no longer exists');
@@ -81,13 +84,13 @@ export class AuthService {
             },
         );
 
-        return accessToken; 
+        return { accessToken }; 
     }
 
     async emailRegister (registerDto: AuthEmailRegisterDto): Promise<void> {
         const user = await this.usersService.create({
             ...registerDto,
-            role: "shop"
+            role: "admin"
         })
     }
     
@@ -117,6 +120,22 @@ export class AuthService {
             },
             accessToken: tokenPair.accessToken,
             refreshToken: tokenPair.refreshToken,
+        }
+    }
+
+    async logout (@Res({ passthrough: true }) res: Response): Promise<any> {
+        try {
+            res.clearCookie('refresh_token', {
+                httpOnly: true,
+                // secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+            });
+
+            return { message: 'Logout successfull'}
+        } catch (err) {
+            console.error(err);
+            throw new BadRequestException('Logout failed');
         }
     }
 
