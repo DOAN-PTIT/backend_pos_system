@@ -1,7 +1,13 @@
 import { User } from "@prisma/client";
 
 export class LoginResponseDto {
-    user: User;
+    user: {
+        id: number,
+        name: string,
+        email: string,
+        phone_number: string,
+        role: string
+    };
 
     accessToken: string;
 

@@ -28,7 +28,7 @@ export class AuthService {
     ) {}
 
     private async genTokensPair (user: User) {
-        const payload = { email: user.email, userId: user.id, userRole: user.role };
+        const payload = { email: user.email, id: user.id, role: user.role };
 
         const accessToken = await this.jwtService.signAsync(
             { ...payload },
@@ -72,8 +72,10 @@ export class AuthService {
         }
 
         const accessToken = await this.jwtService.signAsync(
-            { ...payload }, 
-            {
+            { 
+                email: userExists.email, 
+                id: userExists.id 
+            }, {
                 secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
                 expiresIn: '30m',
             },
@@ -106,7 +108,13 @@ export class AuthService {
         });
 
         return {
-            user: foundUser,
+            user: {
+                id: foundUser.id,
+                name: foundUser.name,
+                email: foundUser.email,
+                phone_number: foundUser.phone_number,
+                role: foundUser.role
+            },
             accessToken: tokenPair.accessToken,
             refreshToken: tokenPair.refreshToken,
         }

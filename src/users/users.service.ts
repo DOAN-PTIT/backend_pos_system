@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './repositories/user.repository';
@@ -12,6 +12,18 @@ export class UsersService {
         private UserRepository: UserRepository,
         private prisma: PrismaService
     ) {}
+
+    async getProfileByUserId (id: number): Promise<any> {
+        let userProfile: any
+        try {
+            userProfile = await this.UserRepository.findUserById(id);
+        } catch (err) {
+            console.error(err);
+            throw new NotFoundException('User profile not found')
+        }
+
+        return userProfile;
+    }
 
     async create (createUserDto: CreateUserDto): Promise<any> {
         // check email existed?
@@ -32,7 +44,7 @@ export class UsersService {
                 email: createUserDto.email,
                 name: createUserDto.name,
                 password: passwordHash,
-                phoneNumber: createUserDto.phoneNumber || null,
+                phone_number: createUserDto.phone_number || null,
                 role: createUserDto.role,
             }
         }) 

@@ -13,12 +13,157 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 model User {
-  id          Int     @id @default(autoincrement())
-  email       String  @unique
-  name        String?
-  password    String
-  phoneNumber String?
-  role        String @default("shop")
-  createdAt DateTime @default(now())
+  id            Int     @id @default(autoincrement())
+  email         String  @unique
+  name          String?
+  password      String
+  phone_number  String?
+  date_of_birth DateTime?
+  role          String @default("shop")
+  updatedAt     DateTime @updatedAt @default(now())
+  createdAt     DateTime @default(now())
+  shopusers     ShopUser[]
+}
+
+model Shop {
+  id            Int     @id @default(autoincrement())
+  name          String
+  avatar        String
+  currency      String @default("VND")
+  description   String
+  updatedAt     DateTime @updatedAt @default(now())
+  createdAt     DateTime @default(now())
+  shopusers     ShopUser[]
+  promotions    Promotion[]
+  products      Product[]
+  shopsetting   ShopSetting?
+  shopcustomers ShopCustomer[]
+}
+
+model ShopSetting {
+  id            Int     @id @default(autoincrement())
+  date_format   String
+  location      String
+  language      String
+  updatedAt     DateTime @updatedAt @default(now())
+  createdAt     DateTime @default(now())
+  shop_id       Int @unique
+  shop          Shop @relation(fields: [shop_id], references: [id])
+}
+
+model ShopUser {
+  id            Int     @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  user_id       Int
+  shop_id       Int
+  user          User @relation(fields: [user_id], references: [id])
+  shop          Shop @relation(fields: [shop_id], references: [id])
+}
+
+model Product {
+  id            Int     @id @default(autoincrement())
+  name          String
+  description   String
+  note          String
+  image         String
+  product_code  String
+  updatedAt     DateTime @updatedAt @default(now())
+  createdAt     DateTime @default(now())
+  variations    Variation[]
+  promotionitems PromotionItem[]
+  orderitems    OrderItem[]
+  shop_id       Int
+  shop          Shop @relation(fields: [shop_id], references: [id])
+}
+
+model Variation {
+  id            Int     @id @default(autoincrement())
+  retail_price  Int
+  image         String
+  amount        Int
+  barcode       String
+  product_code  String
+  price_at_counter  Int
+  updatedAt     DateTime @updatedAt @default(now())
+  createdAt     DateTime @default(now())
+  product_id    Int 
+  product       Product @relation(fields: [product_id], references: [id])
+}
+
+model Promotion {
+  id            Int     @id @default(autoincrement())
+  value         Int
+  name          Int
+  start_date    DateTime
+  due_date      DateTime
+  is_discount_percent Int
+  updatedAt     DateTime @updatedAt @default(now())
+  createdAt     DateTime @default(now())
+  promotionitems PromotionItem[]
+  shop_id       Int
+  shop          Shop @relation(fields: [shop_id], references: [id])
+}
+
+model Order {
+  id            Int     @id @default(autoincrement())
+  note          String
+  status        Boolean
+  createdAt     DateTime @default(now())
+  orderitems    OrderItem[]
+  customer_id   Int
+  customer      Customer @relation(fields: [customer_id], references: [id])
+}
+
+model OrderItem {
+  id            Int     @id @default(autoincrement())
+  quantity      Int
+  createdAt     DateTime @default(now())
+  product_id    Int
+  product       Product @relation(fields: [product_id], references: [id])
+  order_id      Int
+  order         Order @relation(fields: [order_id], references: [id])
+}
+
+model Customer {
+  id            Int     @id @default(autoincrement())
+  name          String
+  email         String
+  gender        Gender
+  address       String
+  phone_number  String
+  updatedAt     DateTime @updatedAt @default(now())
+  createdAt     DateTime @default(now())
+  orders        Order[]
+  shopcustomers ShopCustomer[]
+}
+
+model ShopCustomer {
+  id            Int     @id @default(autoincrement())
+  phone_number  String
+  date_of_birth DateTime
+  email         String
+  name          String
+  refferal_code String
+  updatedAt     DateTime @updatedAt @default(now())
+  createdAt     DateTime @default(now())
+  shop_id       Int
+  shop          Shop @relation(fields: [shop_id], references: [id])
+  customer_id   Int
+  customer      Customer @relation(fields: [customer_id], references: [id])
+}
+
+model PromotionItem {
+  id            Int     @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  product_id    Int
+  product       Product @relation(fields: [product_id], references: [id])
+  promotion_id  Int
+  promotion     Promotion @relation(fields: [promotion_id], references: [id])
 }

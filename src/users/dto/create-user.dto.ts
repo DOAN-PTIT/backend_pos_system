@@ -13,7 +13,7 @@ export class CreateUserDto {
     name: string;
 
     @IsOptional()
-    phoneNumber?: string | null;
+    phone_number?: string | null;
 
     @IsOptional()
     role?: string | 'shop';
