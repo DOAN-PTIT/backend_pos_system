@@ -43,12 +43,23 @@ export class UsersService {
             data: {
                 email: createUserDto.email,
                 name: createUserDto.name,
-                password: passwordHash,
+                password: passwordHash || '',
                 phone_number: createUserDto.phone_number || null,
                 role: createUserDto.role,
             }
         }) 
-        
+    }
+
+    async findUserByEmail(email: string): Promise<any> {
+        let userProfile: any
+        try {
+            userProfile = await this.UserRepository.findUserByEmail(email);
+        } catch (err) {
+            console.error(err);
+            throw new NotFoundException('User profile not found')
+        }
+
+        return userProfile;
     }
 
 }
