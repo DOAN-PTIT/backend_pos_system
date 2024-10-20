@@ -1,9 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, BadRequestException } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import * as dotenv from 'dotenv';
 
-const app_port = process.env.PORT || 8080
+const app_port = process.env.PORT || 8080;
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,7 +15,7 @@ async function bootstrap() {
 
   // CORS config
   app.enableCors({
-    origin: 'http://localhost:3000', 
+    origin: 'http://localhost:3000',
     credentials: true,
   });
 
