@@ -77,7 +77,8 @@ export class AuthService {
         const accessToken = await this.jwtService.signAsync(
             { 
                 email: userExists.email, 
-                id: userExists.id 
+                id: userExists.id,
+                role: userExists.role
             }, {
                 secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
                 expiresIn: '30m',
