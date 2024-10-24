@@ -27,8 +27,8 @@ model User {
   phone_number  String?
   date_of_birth DateTime?
   role          String @default("shop")
-  updatedAt     DateTime @updatedAt @default(now())
-  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   shopusers     ShopUser[]
 }
 
@@ -38,8 +38,8 @@ model Shop {
   avatar        String
   currency      String @default("VND")
   description   String
-  updatedAt     DateTime @updatedAt @default(now())
-  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   shopusers     ShopUser[]
   promotions    Promotion[]
   products      Product[]
@@ -52,15 +52,15 @@ model ShopSetting {
   date_format   String
   location      String
   language      String
-  updatedAt     DateTime @updatedAt @default(now())
-  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   shop_id       Int @unique
   shop          Shop @relation(fields: [shop_id], references: [id])
 }
 
 model ShopUser {
   id            Int     @id @default(autoincrement())
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   user_id       Int
   shop_id       Int
   user          User @relation(fields: [user_id], references: [id])
@@ -74,8 +74,8 @@ model Product {
   note          String
   image         String
   product_code  String
-  updatedAt     DateTime @updatedAt @default(now())
-  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime @default(now())@db.Timestamptz(6)
   variations    Variation[]
   promotionitems PromotionItem[]
   orderitems    OrderItem[]
@@ -91,8 +91,8 @@ model Variation {
   barcode       String
   product_code  String
   price_at_counter  Int
-  updatedAt     DateTime @updatedAt @default(now())
-  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   product_id    Int 
   product       Product @relation(fields: [product_id], references: [id])
 }
@@ -104,8 +104,8 @@ model Promotion {
   start_date    DateTime
   due_date      DateTime
   is_discount_percent Int
-  updatedAt     DateTime @updatedAt @default(now())
-  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   promotionitems PromotionItem[]
   shop_id       Int
   shop          Shop @relation(fields: [shop_id], references: [id])
@@ -115,7 +115,7 @@ model Order {
   id            Int     @id @default(autoincrement())
   note          String
   status        Boolean
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orderitems    OrderItem[]
   customer_id   Int
   customer      Customer @relation(fields: [customer_id], references: [id])
@@ -124,7 +124,7 @@ model Order {
 model OrderItem {
   id            Int     @id @default(autoincrement())
   quantity      Int
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   product_id    Int
   product       Product @relation(fields: [product_id], references: [id])
   order_id      Int
@@ -138,8 +138,8 @@ model Customer {
   gender        Gender
   address       String
   phone_number  String
-  updatedAt     DateTime @updatedAt @default(now())
-  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orders        Order[]
   shopcustomers ShopCustomer[]
 }
@@ -151,8 +151,8 @@ model ShopCustomer {
   email         String
   name          String
   refferal_code String
-  updatedAt     DateTime @updatedAt @default(now())
-  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   shop_id       Int
   shop          Shop @relation(fields: [shop_id], references: [id])
   customer_id   Int
@@ -161,7 +161,7 @@ model ShopCustomer {
 
 model PromotionItem {
   id            Int     @id @default(autoincrement())
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
   product_id    Int
   product       Product @relation(fields: [product_id], references: [id])
   promotion_id  Int
