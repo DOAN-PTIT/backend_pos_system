@@ -3,6 +3,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { CreateShopDto } from './dto/create-shop.dto';
 import { ShopRepository } from './repositories/shop.repository';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ShopService {
@@ -10,7 +11,8 @@ export class ShopService {
     constructor (
         private readonly prisma: PrismaService,
         private readonly shopRepository: ShopRepository,
-        private cloudinary: CloudinaryService
+        private cloudinary: CloudinaryService,
+        private configService: ConfigService,
     ) {}
 
     async createShop (createShopDto: CreateShopDto, avatar: Express.Multer.File, userId: number) {
@@ -21,17 +23,24 @@ export class ShopService {
             // if (foundShop) throw new BadRequestException(`Shop ${name} already exists`)
 
             // get avatar url cloud
-            const avatarResponse = await this.cloudinary.uploadImage(avatar)
-            .catch(() => {
-                console.log('Invalid file type')
-                throw new BadRequestException('Invalid file type');
-            })
+            let avatarUrl:any
+            if (avatar) {
+                const avatarResponse = await this.cloudinary.uploadImage(avatar)
+                .catch(() => {
+                    console.log('Invalid file type')
+                    throw new BadRequestException('Invalid file type');
+                })
+                
+                avatarUrl = avatarResponse.url
+            } else {
+                avatarUrl = this.configService.get<string>('AVATAR_DEFAULT')
+            }
 
             // create shop
             const newShop = await this.prisma.shop.create({
                 data: { 
                     name: name,
-                    avatar: avatarResponse.url,
+                    avatar: avatarUrl,
                     currency: "VND",
                     description: "No description"
                 }
