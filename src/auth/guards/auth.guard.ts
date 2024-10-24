@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
                 email: payload.email,
                 roles: [payload.role]
             };
-            console.log(request.user);
+            // console.log(request.user);
             return true
         } catch (error) {
             if (error.name === 'TokenExpiredError') {

@@ -6,10 +6,20 @@ import { UserRepository } from './repositories/user.repository';
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from 'src/auth/auth.service';
+import { ShopModule } from 'src/shop/shop.module';
+import { ShopService } from 'src/shop/shop.service';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
-  imports: [AuthModule],
-  providers: [UsersService, PrismaService, UserRepository, JwtService, AuthService],
+  imports: [AuthModule, ShopModule, CloudinaryModule],
+  providers: [
+    UsersService, 
+    PrismaService, 
+    UserRepository, 
+    JwtService, 
+    AuthService, 
+    ShopService,
+  ],
   controllers: [UsersController]
 })
 export class UsersModule {}
