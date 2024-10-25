@@ -14,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
     UserRepository, 
     JwtService,
   ],
-  controllers: [AuthController]
+  controllers: [AuthController],
+  exports: [AuthService, JwtService]
 })
 export class AuthModule {}

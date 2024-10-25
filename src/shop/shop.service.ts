@@ -4,6 +4,7 @@ import { CreateShopDto } from './dto/create-shop.dto';
 import { ShopRepository } from './repositories/shop.repository';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ConfigService } from '@nestjs/config';
+import { Role } from 'src/auth/roles/role.enum';
 
 @Injectable()
 export class ShopService {
@@ -69,6 +70,36 @@ export class ShopService {
             console.error('Create shop failed')
             throw new BadRequestException('Create shop failed')
         }
+    }
+
+    async getProductsShopById (shopId: number): Promise<any> {
+
+        const products = await this.prisma.product.findMany({
+            where: {
+                shop_id: shopId
+            }
+        })
+
+        // order by revenue
+
+        // order by profit
+
+        return products
+    }
+
+    async getEmployeesShopById (shopId: number): Promise<any> {
+
+        const employees = await this.prisma.shopUser.findMany({
+            where: {
+                shop: { id: shopId },
+                // role: Role.Employee
+            },
+            include: {
+                user: true
+            }
+        })
+
+        return employees
     }
 
 }
