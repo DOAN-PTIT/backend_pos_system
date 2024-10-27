@@ -38,11 +38,4 @@ export class ShopController {
         return await this.shopService.getListShop(userId)
     }
 
-    @Roles(Role.Admin)
-    @Post("create-shop")
-    async createShop(@Body() params, @Req() req: Request): Promise<any> {
-        const userId = req.user.id
-        return await this.shopService.createShop(params.shop, params.avatar, userId)
-    }
-
 }

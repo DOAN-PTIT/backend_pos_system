@@ -24,8 +24,7 @@ export class ShopService {
 
     async createShop (createShopDto: CreateShopDto, avatar: Express.Multer.File, userId: number) {
         const { name } = createShopDto
-        console.log(createShopDto);
-        avatar
+
         try {
             // check shop name of user duplicate
             // const foundShop = await this.shopRepository.findShopOfUserByShopName(name, userId)
