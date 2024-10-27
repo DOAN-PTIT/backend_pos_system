@@ -27,7 +27,7 @@ export class AuthService {
         private configService: ConfigService,
     ) {}
 
-    private async genTokensPair (user: User) {
+    async genTokensPair (user: User) {
         const payload = { email: user.email, id: user.id, role: user.role };
 
         const accessToken = await this.jwtService.signAsync(

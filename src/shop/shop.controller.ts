@@ -1,10 +1,12 @@
+import { CreateShopDto } from './dto/create-shop.dto';
 import { 
     Controller,
     UseGuards,
     Get,
     Req,
     Body,
-    Post
+    Post,
+    Param
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/roles/role.guard';
@@ -27,6 +29,20 @@ export class ShopController {
     async getProducts (@Body() getProductsDto: GetProductsDto): Promise<any> {
         const { shopId } = getProductsDto
         return await this.shopService.getProductsShopById(shopId);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @Get("list-shop")
+    async getListShop(@Req() req: Request): Promise<any> {
+        const userId = req.user.id;
+        return await this.shopService.getListShop(userId)
+    }
+
+    @Roles(Role.Admin)
+    @Post("create-shop")
+    async createShop(@Body() params, @Req() req: Request): Promise<any> {
+        const userId = req.user.id
+        return await this.shopService.createShop(params.shop, params.avatar, userId)
     }
 
 }

@@ -16,5 +16,11 @@ export class CreateUserDto {
     phone_number?: string | null;
 
     @IsOptional()
+    fb_id?: string | null;
+
+    @IsOptional()
+    access_token?: string | null;
+
+    @IsOptional()
     role?: string | 'shop';
 }

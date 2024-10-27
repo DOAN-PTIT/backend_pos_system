@@ -16,8 +16,16 @@ export class ShopService {
         private configService: ConfigService,
     ) {}
 
+    async getListShop(userId: number) {
+        let listShop = []
+        listShop = await this.shopRepository.findShopByUserId(userId)
+        return listShop
+    }
+
     async createShop (createShopDto: CreateShopDto, avatar: Express.Multer.File, userId: number) {
         const { name } = createShopDto
+        console.log(createShopDto);
+        avatar
         try {
             // check shop name of user duplicate
             // const foundShop = await this.shopRepository.findShopOfUserByShopName(name, userId)
