@@ -46,6 +46,8 @@ export class UsersService {
                 password: passwordHash || '',
                 phone_number: createUserDto.phone_number || null,
                 role: createUserDto.role,
+                fb_id: createUserDto.fb_id,
+                access_token: createUserDto.access_token
             }
         }) 
     }
@@ -61,5 +63,5 @@ export class UsersService {
 
         return userProfile;
     }
-
+    
 }

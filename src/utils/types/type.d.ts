@@ -5,7 +5,9 @@ declare namespace Express {
             email: string,
             role: string,
             firstName: string,
-            lastName: string
+            lastName: string,
+            accessToken?: string,
+            fb_id?: string
         };
     }
 }

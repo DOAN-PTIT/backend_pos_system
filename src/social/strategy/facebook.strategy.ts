@@ -40,11 +40,12 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
 
     const payload = {
       email: emails[0].value,
+      fb_id: profile.id,
       firstName: name.givenName,
       lastName: name.familyName,
       accessToken,
     };
-    
+
     done(null, payload);
   }
 }

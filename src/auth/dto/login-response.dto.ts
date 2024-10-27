@@ -6,7 +6,9 @@ export class LoginResponseDto {
         name: string,
         email: string,
         phone_number: string,
-        role: string
+        role: string,
+        accessToken?: string,
+        fb_id?: string
     };
 
     accessToken: string;

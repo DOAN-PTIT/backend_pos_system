@@ -25,10 +25,12 @@ model User {
   name          String?
   password      String
   phone_number  String?
+  fb_id         String?
+  access_token  String?
   date_of_birth DateTime?
   role          String @default("shop")
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime? @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime? @default(now()) @db.Timestamptz(6)
   shopusers     ShopUser[]
 }
 

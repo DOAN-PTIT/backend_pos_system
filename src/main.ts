@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
+import * as express from 'express';
 
 const app_port = process.env.PORT || 8080;
 dotenv.config();
@@ -12,6 +13,9 @@ async function bootstrap() {
 
   // Cookies config
   app.use(cookieParser());
+  // Set the body parser limit
+  app.use(express.json({ limit: '10mb' })); // Increase this limit as needed
+  app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
   // CORS config
   app.enableCors({

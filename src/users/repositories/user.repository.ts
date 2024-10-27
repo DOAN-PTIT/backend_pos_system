@@ -34,7 +34,9 @@ export class UserRepository {
                     email: true,
                     phone_number: true,
                     date_of_birth: true,
-                    role: true
+                    role: true,
+                    access_token: true,
+                    fb_id: true
                 },
             })
         } catch (err) {
