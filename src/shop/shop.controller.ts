@@ -69,6 +69,7 @@ export class ShopController {
 
     @UseGuards(AuthGuard, RolesGuard)
     @Roles(Role.User, Role.Admin)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Post('create-product/:shopId')
     @UseInterceptors(FileInterceptor('image'))
     async createShop (
