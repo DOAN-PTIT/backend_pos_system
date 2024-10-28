@@ -47,4 +47,17 @@ export class ShopRepository {
         return shops
     }
 
+    async findShopById(shopId: number): Promise<Shop> {
+        try {
+            const shop: Shop = await this.prisma.shop.findUnique({
+                where: {id: shopId},
+            })
+
+            return shop
+        } catch (err) {
+            console.error(err)
+            throw new BadRequestException('Shop not found')
+        }
+    }
+
 }

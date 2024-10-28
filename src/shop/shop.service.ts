@@ -5,6 +5,7 @@ import { ShopRepository } from './repositories/shop.repository';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ConfigService } from '@nestjs/config';
 import { Role } from 'src/auth/roles/role.enum';
+import { UpdateShopSettingDto } from './dto/update-shop-setting.dto';
 
 @Injectable()
 export class ShopService {
@@ -107,6 +108,43 @@ export class ShopService {
         })
 
         return employees
+    }
+
+    async getSettingByShopId (shopId: number): Promise<any> {
+        try {
+            const setting = await this.prisma.shopSetting.findUnique({
+                where: { id: shopId },
+            })
+    
+            return setting
+        } catch (err) {
+            console.log(err)
+            throw new BadRequestException('Cannot get setting')
+        }
+    }
+
+    async updateSettingByShopId (shopId: number, updateShopSettingDto: UpdateShopSettingDto): Promise<any> {
+        try {
+            const {date_format, location, language} = updateShopSettingDto
+
+            // check shop exist?
+            const foundShop = await this.shopRepository.findShopById(shopId)
+            if (!foundShop) throw new BadRequestException('Shop to update not found')
+            
+            const updateShopSetting = await this.prisma.shopSetting.update({
+                where: { id: shopId },
+                data: {
+                    date_format,
+                    location,
+                    language
+                }
+            })
+
+            return updateShopSetting
+        } catch (err) {
+            console.log(err)
+            throw new BadRequestException(err.message)
+        }
     }
 
 }
