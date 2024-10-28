@@ -51,10 +51,22 @@ export class SocialService {
         id: parseInt(req.user.fb_id, req.user.fb_id.length),
       };
 
-      await this.usersService.create(newUserWithFbLogin);
-      tokenPair = await this.authService.genTokensPair(newUserWithFbLogin);
+      const newUserFb = await this.usersService.create(newUserWithFbLogin);
+      
+      const payloadGenTokenPair = {
+        id: newUserFb.id,
+        email: newUserFb.email,
+        role: newUserFb.role,
+      }
+      tokenPair = await this.authService.genTokensPair(payloadGenTokenPair);
     } else {
-      tokenPair = await this.authService.genTokensPair(foundUser);
+      const payloadGenTokenPair = {
+        id: foundUser.id,
+        email: foundUser.email,
+        role: foundUser.role,
+      }
+
+      tokenPair = await this.authService.genTokensPair(payloadGenTokenPair);
       await this.prisma.user.update({
         where: {
           id: foundUser.id,
