@@ -28,7 +28,7 @@ model User {
   fb_id         String?
   access_token  String?
   date_of_birth DateTime?
-  role          String @default("shop")
+  role          String @default("user")
   updatedAt     DateTime? @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime? @default(now()) @db.Timestamptz(6)
   shopusers     ShopUser[]
@@ -62,6 +62,7 @@ model ShopSetting {
 
 model ShopUser {
   id            Int     @id @default(autoincrement())
+  role          String @default("admin")
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   user_id       Int
   shop_id       Int
@@ -148,11 +149,6 @@ model Customer {
 
 model ShopCustomer {
   id            Int     @id @default(autoincrement())
-  phone_number  String
-  date_of_birth DateTime
-  email         String
-  name          String
-  refferal_code String
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   shop_id       Int
