@@ -7,7 +7,9 @@ import {
     Body,
     Post,
     Param,
-    ParseIntPipe
+    ParseIntPipe,
+    UseInterceptors,
+    UploadedFile
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/roles/role.guard';
@@ -20,6 +22,8 @@ import { UpdateShopSettingDto } from './dto/update-shop-setting.dto';
 import { RolesShopGuard } from 'src/auth/roles/role.shop.guard';
 import { RoleShop } from 'src/auth/roles/role.shop.enum';
 import { RolesShop } from 'src/auth/roles/role.shop.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -61,6 +65,19 @@ export class ShopController {
     ): Promise<any> {
 
         return await this.shopService.updateSettingByShopId(shopId, updateShopSettingDto)
+    }
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(Role.User, Role.Admin)
+    @Post('create-product/:shopId')
+    @UseInterceptors(FileInterceptor('image'))
+    async createShop (
+        @Param('shopId', ParseIntPipe) shopId: number, 
+        @Body() createProductDto: CreateProductDto, 
+        @UploadedFile() image: Express.Multer.File
+    ): Promise<any> {
+        
+        return await this.shopService.createProduct(createProductDto, shopId, image);
     }
 
 }

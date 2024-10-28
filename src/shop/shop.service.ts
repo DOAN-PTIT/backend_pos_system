@@ -6,6 +6,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ConfigService } from '@nestjs/config';
 import { Role } from 'src/auth/roles/role.enum';
 import { UpdateShopSettingDto } from './dto/update-shop-setting.dto';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @Injectable()
 export class ShopService {
@@ -144,6 +145,48 @@ export class ShopService {
             return updateShopSetting
         } catch (err) {
             console.log(err)
+            throw new BadRequestException(err.message)
+        }
+    }
+
+    async createProduct (createProductDto: CreateProductDto, shopId: number, image: Express.Multer.File): Promise<any> {
+        const { name, description = '', note, product_code = '' } = createProductDto
+        try {
+            const foundProductByCode = await this.prisma.product.findFirst({
+                where: { 
+                    shop_id: shopId,
+                    product_code: product_code
+                },
+            })
+            if (foundProductByCode) throw new BadRequestException('Product_code existed')
+
+            let imageUrl:any
+            if (image) {
+                const imageResponse = await this.cloudinary.uploadImage(image)
+                .catch(() => {
+                    console.log('Invalid file type')
+                    throw new BadRequestException('Invalid file type');
+                })
+                
+                imageUrl = imageResponse.url
+            } else {
+                imageUrl = this.configService.get<string>('PRODUCT_IMAGE_DEFAULT')
+            }
+
+            const newProduct = await this.prisma.product.create({
+                data: {
+                    name,
+                    description,
+                    note,
+                    product_code,
+                    image: imageUrl,
+                    shop_id: shopId,
+                }
+            })
+
+            return newProduct
+        } catch (err) {
+            console.error(err)
             throw new BadRequestException(err.message)
         }
     }
