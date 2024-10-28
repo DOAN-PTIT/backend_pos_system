@@ -29,7 +29,7 @@ export class ShopController {
         private shopService: ShopService,
     ) {}
 
-    @Roles(Role.User)
+    @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin)
     @Post('products/:shopId')
     async getProducts (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
