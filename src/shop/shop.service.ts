@@ -60,6 +60,7 @@ export class ShopService {
                 data: {
                     user_id: userId,
                     shop_id: newShop.id,
+                    role: "admin"
                 }
             })
 
@@ -75,8 +76,8 @@ export class ShopService {
 
             return newShop
         } catch (err) {
-            console.error('Create shop failed')
-            throw new BadRequestException('Create shop failed')
+            console.error(err)
+            throw new BadRequestException(err.message)
         }
     }
 

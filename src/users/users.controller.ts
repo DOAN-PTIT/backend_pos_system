@@ -39,7 +39,11 @@ export class UsersController {
     @Roles(Role.User, Role.Admin)
     @Post('create-shop')
     @UseInterceptors(FileInterceptor('avatar'))
-    async createShop (@Req() req: Request, @Body() createShopDto: CreateShopDto, @UploadedFile() avatar: Express.Multer.File): Promise<any> {
+    async createShop (
+        @Req() req: Request, 
+        @Body() createShopDto: CreateShopDto, 
+        @UploadedFile() avatar: Express.Multer.File
+    ): Promise<any> {
         const userId = req.user.id;
 
         return await this.shopService.createShop(createShopDto, avatar, userId);

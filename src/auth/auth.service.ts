@@ -91,7 +91,7 @@ export class AuthService {
     async emailRegister (registerDto: AuthEmailRegisterDto): Promise<void> {
         const user = await this.usersService.create({
             ...registerDto,
-            role: "admin"
+            role: "user"
         })
     }
     
