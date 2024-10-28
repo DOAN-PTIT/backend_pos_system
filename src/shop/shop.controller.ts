@@ -30,7 +30,7 @@ export class ShopController {
     ) {}
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Post('products/:shopId')
     async getProducts (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
         
@@ -45,6 +45,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Get("setting/:shopId")
     async getShopSetting (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
 
@@ -52,6 +53,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Post("setting/update/:shopId")
     async updateShopSetting (
         @Param('shopId', ParseIntPipe) shopId: number,
