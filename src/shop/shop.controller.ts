@@ -17,19 +17,23 @@ import { Role } from 'src/auth/roles/role.enum';
 import { ShopService } from './shop.service';
 import { GetProductsDto } from './dto/get-products.dto';
 import { UpdateShopSettingDto } from './dto/update-shop-setting.dto';
+import { RolesShopGuard } from 'src/auth/roles/role.shop.guard';
+import { RoleShop } from 'src/auth/roles/role.shop.enum';
+import { RolesShop } from 'src/auth/roles/role.shop.decorator';
 
 @Controller('shop')
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
 export class ShopController {
 
     constructor (
         private shopService: ShopService,
     ) {}
 
-    @Roles(Role.Admin)
-    @Post('products')
-    async getProducts (@Body() getProductsDto: GetProductsDto): Promise<any> {
-        const { shopId } = getProductsDto
+    @Roles(Role.User)
+    @RolesShop(RoleShop.Admin)
+    @Post('products/:shopId')
+    async getProducts (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
+        
         return await this.shopService.getProductsShopById(shopId);
     }
 
