@@ -43,6 +43,14 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/employees')
+    async getEmployees (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
+        
+        return await this.shopService.getEmployeesShopById(shopId);
+    }
+
+    @Roles(Role.Admin, Role.User)
     @Get("list-shop")
     async getListShop(@Req() req: Request): Promise<any> {
         const userId = req.user.id;

@@ -102,18 +102,29 @@ export class ShopService {
     }
 
     async getEmployeesShopById (shopId: number): Promise<any> {
+        try {
+            const employees = await this.prisma.shopUser.findMany({
+                where: {
+                    shop: { id: shopId },
+                    // role: Role.Employee
+                },
+                include: {
+                    user: { 
+                        select: {
+                            id: true,
+                            email: true,
+                            name: true
+                        }
+                    }
+                }
+            })
+            if (employees == undefined) throw new BadRequestException('Cannot get list employees')
 
-        const employees = await this.prisma.shopUser.findMany({
-            where: {
-                shop: { id: shopId },
-                // role: Role.Employee
-            },
-            include: {
-                user: true
-            }
-        })
-
-        return employees
+            return employees
+        } catch (error) {
+            console.log(error)
+            throw new BadRequestException(error.message)
+        }
     }
 
     async getSettingByShopId (shopId: number): Promise<any> {
