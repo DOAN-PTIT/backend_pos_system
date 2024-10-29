@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
+import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
 
 enum DateFormat {
     DD_MM_YYYY = 'DD/MM/YYYY',
@@ -11,13 +11,27 @@ enum Language {
     VI = "vi",
 }
 
+enum SourceOrder {
+    FACEBOOK = "facebook",
+    TIKTOK = "tiktok",
+}
+
 export class UpdateShopSettingDto {
     @IsEnum(DateFormat)
-    date_format?: string;
+    date_format?: DateFormat;
 
     @IsString()
-    location: string;
+    location?: string;
 
     @IsEnum(Language)
-    language: Language;
+    language?: Language;
+
+    @IsBoolean()
+    auto_product_code?: boolean;
+
+    @IsEnum(SourceOrder)
+    source_order?: SourceOrder
+
+    @IsString()
+    time_zone?: string;
 }

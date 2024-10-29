@@ -127,7 +127,10 @@ export class ShopService {
 
     async updateSettingByShopId (shopId: number, updateShopSettingDto: UpdateShopSettingDto): Promise<any> {
         try {
-            const {date_format, location, language} = updateShopSettingDto
+            const { 
+                date_format, location, language, 
+                auto_product_code, source_order, time_zone
+            } = updateShopSettingDto
 
             // check shop exist?
             const foundShop = await this.shopRepository.findShopById(shopId)
@@ -138,7 +141,10 @@ export class ShopService {
                 data: {
                     date_format,
                     location,
-                    language
+                    language,
+                    auto_product_code,
+                    source_order,
+                    time_zone,
                 }
             })
 
