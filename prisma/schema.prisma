@@ -22,7 +22,7 @@ enum Gender {
 model User {
   id            Int     @id @default(autoincrement())
   email         String  @unique
-  name          String?
+  name          String
   password      String
   phone_number  String?
   fb_id         String?
@@ -39,7 +39,7 @@ model Shop {
   name          String
   avatar        String
   currency      String @default("VND")
-  description   String
+  description   String?
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   shopusers     ShopUser[]
@@ -54,6 +54,9 @@ model ShopSetting {
   date_format   String
   location      String
   language      String
+  time_zone     String  @default("Asia/Ho_Chi_Minh")
+  auto_product_code Boolean @default(false)
+  source_order  String?
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   shop_id       Int @unique
@@ -73,10 +76,10 @@ model ShopUser {
 model Product {
   id            Int     @id @default(autoincrement())
   name          String
-  description   String
-  note          String
+  description   String?
+  note          String?
   image         String
-  product_code  String
+  product_code  String @unique
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now())@db.Timestamptz(6)
   variations    Variation[]
@@ -91,8 +94,8 @@ model Variation {
   retail_price  Int
   image         String
   amount        Int
-  barcode       String
-  product_code  String
+  barcode       String  @unique
+  product_code  String  @unique
   price_at_counter  Int
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
@@ -116,7 +119,7 @@ model Promotion {
 
 model Order {
   id            Int     @id @default(autoincrement())
-  note          String
+  note          String?
   status        Boolean
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orderitems    OrderItem[]
@@ -137,10 +140,10 @@ model OrderItem {
 model Customer {
   id            Int     @id @default(autoincrement())
   name          String
-  email         String
+  email         String  @unique
   gender        Gender
-  address       String
-  phone_number  String
+  address       String?
+  phone_number  String?
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orders        Order[]
