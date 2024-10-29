@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { Role } from 'src/auth/roles/role.enum';
 import { UpdateShopSettingDto } from './dto/update-shop-setting.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateShopDto } from './dto/update-shop.dto';
 
 @Injectable()
 export class ShopService {
@@ -191,6 +192,41 @@ export class ShopService {
             })
 
             return newProduct
+        } catch (err) {
+            console.error(err)
+            throw new BadRequestException(err.message)
+        }
+    }
+
+    async updateShopProfile (
+        updateShopProfileDto: UpdateShopDto, 
+        shopId: number,
+        avatar: Express.Multer.File
+    ): Promise<any> {
+        try {
+            const { name } = updateShopProfileDto
+            if (avatar) {
+                const avatarResponse = await this.cloudinary.uploadImage(avatar)
+                .catch(() => {
+                    console.log('Invalid file type')
+                    throw new BadRequestException('Invalid file type');
+                })
+                
+                const avatarUrl = avatarResponse.url
+
+                return await this.prisma.shop.update({
+                    where: { id: shopId },
+                    data: {
+                        name,
+                        avatar: avatarUrl
+                    }
+                })
+            } else {
+                return this.prisma.shop.update({
+                    where: { id: shopId },
+                    data: { name }
+                })
+            }
         } catch (err) {
             console.error(err)
             throw new BadRequestException(err.message)

@@ -67,7 +67,6 @@ export class ShopController {
         return await this.shopService.updateSettingByShopId(shopId, updateShopSettingDto)
     }
 
-    @UseGuards(AuthGuard, RolesGuard)
     @Roles(Role.User, Role.Admin)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Post('create-product/:shopId')
@@ -79,6 +78,19 @@ export class ShopController {
     ): Promise<any> {
         
         return await this.shopService.createProduct(createProductDto, shopId, image);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @Post("profile/update/:shopId")
+    @UseInterceptors(FileInterceptor('avatar'))
+    async updateShopProfile (
+        @Param('shopId', ParseIntPipe) shopId: number,
+        @Body() updateShopProfileDto: CreateShopDto,
+        @UploadedFile() avatar: Express.Multer.File
+    ): Promise<any> {
+
+        return await this.shopService.updateShopProfile(updateShopProfileDto, shopId, avatar);
     }
 
 }
