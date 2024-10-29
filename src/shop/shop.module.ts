@@ -5,10 +5,11 @@ import { PrismaService } from 'src/database/prisma.service';
 import { ShopRepository } from './repositories/shop.repository';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { UserRepository } from 'src/users/repositories/user.repository';
 
 @Module({
   imports: [CloudinaryModule, AuthModule],
-  providers: [ShopService, PrismaService, ShopRepository],
+  providers: [ShopService, PrismaService, ShopRepository, UserRepository],
   controllers: [ShopController],
   exports: [ShopRepository]
 })

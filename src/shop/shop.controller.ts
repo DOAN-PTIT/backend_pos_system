@@ -24,6 +24,7 @@ import { RoleShop } from 'src/auth/roles/role.shop.enum';
 import { RolesShop } from 'src/auth/roles/role.shop.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto } from './dto/create-product.dto';
+import { AddEmployeeDto } from './dto/add-employee.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -91,6 +92,15 @@ export class ShopController {
     ): Promise<any> {
 
         return await this.shopService.updateShopProfile(updateShopProfileDto, shopId, avatar);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @Post(":shopId/employee/add")
+    async addEmployee (@Body() addEmployeeDto: AddEmployeeDto, @Param('shopId') shopId: number): Promise<any> {
+        const { email } = addEmployeeDto
+        
+        return await this.shopService.addEmployee(email, shopId)
     }
 
 }

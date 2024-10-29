@@ -8,6 +8,8 @@ import { Role } from 'src/auth/roles/role.enum';
 import { UpdateShopSettingDto } from './dto/update-shop-setting.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
+import { UserRepository } from 'src/users/repositories/user.repository';
+import { RoleShop } from 'src/auth/roles/role.shop.enum';
 
 @Injectable()
 export class ShopService {
@@ -17,6 +19,7 @@ export class ShopService {
         private readonly shopRepository: ShopRepository,
         private cloudinary: CloudinaryService,
         private configService: ConfigService,
+        private userRepository: UserRepository
     ) {}
 
     async getListShop(userId: number) {
@@ -62,7 +65,7 @@ export class ShopService {
                 data: {
                     user_id: userId,
                     shop_id: newShop.id,
-                    role: "admin"
+                    role: RoleShop.Admin
                 }
             })
 
@@ -229,6 +232,35 @@ export class ShopService {
             }
         } catch (err) {
             console.error(err)
+            throw new BadRequestException(err.message)
+        }
+    }
+
+    async addEmployee (email: string, shopId: number): Promise<any> {
+        try {
+            const foundUser = await this.userRepository.findUserByEmail(email)
+            if (!foundUser) throw new BadRequestException('Employee not found')
+            const userId = foundUser.id
+
+            const foundEmployee = await this.prisma.shopUser.findFirst({ 
+                where: { 
+                    shop_id: shopId,
+                    user_id: userId
+                }
+            })
+            if (foundEmployee) throw new BadRequestException('Employee already in shop')
+
+            const newEmployee = await this.prisma.shopUser.create({
+                data: {
+                    shop_id: shopId,
+                    user_id: userId,
+                    role: RoleShop.Employee
+                }
+            })
+
+            return newEmployee
+        } catch (err) {
+            console.log(err)
             throw new BadRequestException(err.message)
         }
     }
