@@ -276,6 +276,19 @@ export class ShopService {
         }
     }
 
+    async removeEmployee(shopUserId: number): Promise<any> {
+        try {
+            await this.prisma.shopUser.delete({
+                where: { id: shopUserId }
+            })
+
+            return { message: 'Remove employee success' }
+        } catch (error) {
+            console.log(error)
+            throw new BadRequestException(error.message)
+        }
+    }
+
     async getEmployeeDetail (shopId: number, userId: number): Promise<any> {
         try {
             const employee = await this.prisma.shopUser.findFirst({

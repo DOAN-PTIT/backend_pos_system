@@ -9,7 +9,8 @@ import {
     Param,
     ParseIntPipe,
     UseInterceptors,
-    UploadedFile
+    UploadedFile,
+    Delete
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/roles/role.guard';
@@ -103,7 +104,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Admin)
     @Post(":shopId/employee/add")
     async addEmployee (@Body() addEmployeeDto: AddEmployeeDto, @Param('shopId') shopId: number): Promise<any> {
         const { email } = addEmployeeDto
@@ -112,11 +113,19 @@ export class ShopController {
     }
     
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Admin)
     @Get(":shopId/employee/:employId/detail")
     async getDetailEmployee (@Param('shopId') shopId: number, @Param('employId') userId: number): Promise<any> {
         
         return await this.shopService.getEmployeeDetail(shopId, userId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin)
+    @Post(":shopId/employee/:shopUserId/remove")
+    async removeEmployee (@Param('shopUserId') shopUserId: number): Promise<any> {
+        
+        return await this.shopService.removeEmployee(shopUserId)
     }
 
 }
