@@ -265,4 +265,32 @@ export class ShopService {
         }
     }
 
+    async getEmployeeDetail (shopId: number, userId: number): Promise<any> {
+        try {
+            const employee = await this.prisma.shopUser.findFirst({
+                where: { 
+                    shop_id: shopId,
+                    user_id: userId
+                },
+                include: { 
+                    user: { 
+                        select: { 
+                            id: true, 
+                            email: true, 
+                            phone_number: true, 
+                            date_of_birth: true, 
+                            role: true, 
+                            createdAt: true 
+                        }
+                    }
+                }
+            })
+
+            return employee
+        } catch (error) {
+            console.error(error)
+            throw new BadRequestException(error.message)
+        }
+    }
+
 }

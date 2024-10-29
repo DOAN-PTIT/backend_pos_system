@@ -102,5 +102,13 @@ export class ShopController {
         
         return await this.shopService.addEmployee(email, shopId)
     }
+    
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @Get(":shopId/employee/:employId/detail")
+    async getDetailEmployee (@Param('shopId') shopId: number, @Param('employId') userId: number): Promise<any> {
+        
+        return await this.shopService.getEmployeeDetail(shopId, userId)
+    }
 
 }
