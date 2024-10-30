@@ -158,6 +158,7 @@ model Customer {
   address       String?
   phone_number  String
   date_of_birth DateTime? @db.Date
+  last_purchase DateTime? @db.Date
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orders        Order[]

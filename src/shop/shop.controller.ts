@@ -28,6 +28,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AddEmployeeDto } from './dto/add-employee.dto';
 import { GetEmployeesDto } from './dto/get-employees.dto';
+import { AddCustomerDto } from './dto/add-customer.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -131,6 +132,14 @@ export class ShopController {
     async removeEmployee (@Param('shopUserId') shopUserId: number): Promise<any> {
         
         return await this.shopService.removeEmployee(shopUserId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin)
+    @Post(":shopId/customer/add")
+    async addCustomer (@Body() addCustomerDto: AddCustomerDto, @Param('shopId') shopId: number): Promise<any> {
+        
+        return await this.shopService.addCustomer(addCustomerDto, shopId)
     }
 
 }

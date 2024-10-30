@@ -11,6 +11,7 @@ import { UpdateShopDto } from './dto/update-shop.dto';
 import { UserRepository } from 'src/users/repositories/user.repository';
 import { RoleShop } from 'src/auth/roles/role.shop.enum';
 import { SortBy } from '../utils/enum/sort-option.enum'
+import { AddCustomerDto } from './dto/add-customer.dto';
 
 @Injectable()
 export class ShopService {
@@ -371,6 +372,54 @@ export class ShopService {
             return employee
         } catch (error) {
             console.error(error)
+            throw new BadRequestException(error.message)
+        }
+    }
+
+    async addCustomer (addCustomerDto: AddCustomerDto, shopId: number): Promise<any> {
+        try {
+            const { name, email, gender , address, date_of_birth, phone_number, last_purchase } = addCustomerDto    
+
+            // check customer existed
+            const foundCustomer = await this.prisma.customer.findFirst({
+                where: {
+                    shopcustomers: {
+                        some: { shop_id: shopId },
+                    },
+                    OR: [
+                        { email }, 
+                        { phone_number }
+                    ]
+                }
+            })
+            if (foundCustomer) throw new BadRequestException(`Customer already exists with (email: ${foundCustomer.email}, phone_number: ${foundCustomer.phone_number})`)
+            
+            // add user
+            const newCustomer = await this.prisma.customer.create({
+                data: {
+                    name: name,
+                    email: email,
+                    gender: gender,
+                    address: address,
+                    date_of_birth: new Date(date_of_birth),
+                    phone_number: phone_number,
+                    last_purchase: new Date(last_purchase)
+                }
+            })
+            if (!newCustomer) throw new BadRequestException('Cannot add customer')
+
+            // create shopCustomer
+            const newShopCustomer = await this.prisma.shopCustomer.create({
+                data: {
+                    shop_id: shopId,
+                    customer_id: newCustomer.id
+                }
+            })
+            if (!newShopCustomer) throw new BadRequestException('Cannot create shopCustomer, pls take a look in db!')
+
+            return newCustomer
+        } catch (error) {
+            console.log(error)
             throw new BadRequestException(error.message)
         }
     }
