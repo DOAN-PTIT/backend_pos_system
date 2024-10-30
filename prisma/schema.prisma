@@ -156,7 +156,8 @@ model Customer {
   email         String  @unique
   gender        Gender
   address       String?
-  phone_number  String?
+  phone_number  String
+  date_of_birth DateTime? @db.Date
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orders        Order[]
