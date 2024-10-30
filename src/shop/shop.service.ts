@@ -170,8 +170,21 @@ export class ShopService {
         }
     }
 
-    async createProduct (createProductDto: CreateProductDto, shopId: number, image: Express.Multer.File): Promise<any> {
-        const { name, description = '', note, product_code = '' } = createProductDto
+    async createProduct (
+        createProductDto: CreateProductDto, 
+        shopId: number, 
+        image: Express.Multer.File
+    ): Promise<any> {
+        const {
+            name, 
+            description = '', 
+            note, 
+            product_code = '',
+            retail_price,
+            price_at_counter,
+            categories_id = null
+        } = createProductDto
+
         try {
             const foundProductByCode = await this.prisma.product.findFirst({
                 where: { 
@@ -202,6 +215,9 @@ export class ShopService {
                     product_code,
                     image: imageUrl,
                     shop_id: shopId,
+                    retail_price,
+                    price_at_counter,
+                    categories_id,
                 }
             })
 
