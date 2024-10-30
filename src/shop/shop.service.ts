@@ -469,4 +469,26 @@ export class ShopService {
         }
     }
 
+    async removeCustomer (shopId: number, customerId: number): Promise<any> {
+        try {
+            // delete shopCustomer
+            await this.prisma.shopCustomer.deleteMany({
+                where: {
+                    shop_id: shopId,
+                    customer_id: customerId
+                }
+            })
+
+            // delete customer
+            await this.prisma.customer.delete({
+                where: { id: customerId },
+            })
+
+            return { message: 'Remove customer success'}
+        } catch (error) {
+            console.log(error)
+            throw new BadRequestException(error.message)
+        }
+    }
+
 }

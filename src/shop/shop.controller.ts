@@ -151,4 +151,12 @@ export class ShopController {
         return await this.shopService.getCustomers(shopId, page, sortBy);
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin)
+    @Get(':shopId/customer/:customerId/remove')
+    async removeCustomer (@Param('shopId') shopId: number, @Param('customerId') customerId: number): Promise<any> {
+        
+        return await this.shopService.removeCustomer(shopId, customerId);
+    }
+
 }
