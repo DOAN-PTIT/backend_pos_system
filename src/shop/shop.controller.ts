@@ -27,6 +27,7 @@ import { RolesShop } from 'src/auth/roles/role.shop.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AddEmployeeDto } from './dto/add-employee.dto';
+import { GetEmployeesDto } from './dto/get-employees.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -47,9 +48,12 @@ export class ShopController {
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Get(':shopId/employees')
-    async getEmployees (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
-        
-        return await this.shopService.getEmployeesShopById(shopId);
+    async getEmployees (
+        @Param('shopId', ParseIntPipe) shopId: number,
+        @Query() getEmployeesDto: GetEmployeesDto
+    ): Promise<any> {
+        const { page, sortBy } = getEmployeesDto
+        return await this.shopService.getEmployeesShopById(shopId, page, sortBy);
     }
 
     @Roles(Role.Admin, Role.User)

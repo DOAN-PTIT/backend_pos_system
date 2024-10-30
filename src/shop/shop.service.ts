@@ -123,22 +123,42 @@ export class ShopService {
         return products
     }
 
-    async getEmployeesShopById (shopId: number): Promise<any> {
+    async getEmployeesShopById (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
+        const LIMIT = 10
+        const skip = (page -1) * LIMIT
+        let orderBy = {}
+    
+        switch(sortBy) {
+            case SortBy.NAME_ASC:
+                orderBy = { name: 'asc' }
+                break   
+            case SortBy.NAME_DESC:
+                orderBy = { name: 'desc' }
+                break
+            case SortBy.CREATED_AT_ASC:
+                orderBy = { createdAt: 'asc' }
+                break
+            case SortBy.CREATED_AT_DESC:
+                orderBy = { createdAt: 'desc' }
+                break
+        }
+
         try {
-            const employees = await this.prisma.shopUser.findMany({
+            const employees = await this.prisma.user.findMany({
+                skip,
+                take: LIMIT,
                 where: {
-                    shop: { id: shopId },
-                    // role: Role.Employee
-                },
-                include: {
-                    user: { 
-                        select: {
-                            id: true,
-                            email: true,
-                            name: true
+                    shopusers: { 
+                        some: { 
+                            shop_id: shopId, 
+                            // role: Role.Employee 
                         }
-                    }
-                }
+                    },
+                },
+                select: {
+                    id: true, name: true, email: true, phone_number: true, date_of_birth: true, createdAt: true
+                },
+                orderBy: orderBy
             })
             if (employees == undefined) throw new BadRequestException('Cannot get list employees')
 
