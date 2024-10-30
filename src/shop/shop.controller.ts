@@ -10,7 +10,8 @@ import {
     ParseIntPipe,
     UseInterceptors,
     UploadedFile,
-    Delete
+    Delete,
+    Query
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/roles/role.guard';
@@ -38,9 +39,9 @@ export class ShopController {
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Post('products/:shopId')
-    async getProducts (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
-        
-        return await this.shopService.getProductsShopById(shopId);
+    async getProducts (@Param('shopId') shopId: number, @Query() getProductsDto: GetProductsDto): Promise<any> {
+        const { page, sortBy } = getProductsDto
+        return await this.shopService.getProductsShopById(shopId, page, sortBy);
     }
 
     @Roles(Role.Admin, Role.User)

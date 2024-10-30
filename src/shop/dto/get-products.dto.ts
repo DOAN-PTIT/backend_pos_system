@@ -1,7 +1,13 @@
-import { IsNotEmpty, IsNumber } from "class-validator";
+import { IsNotEmpty, IsNumber, IsEnum } from "class-validator";
+import { SortBy } from "src/utils/enum/sort-option.enum";
+import { Transform } from 'class-transformer';
 
 export class GetProductsDto {
     @IsNumber()
     @IsNotEmpty()
-    shopId: number;
+    @Transform(({ value }) => parseInt(value))
+    page: number;
+
+    @IsEnum(SortBy)
+    sortBy: SortBy
 }

@@ -10,6 +10,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { UserRepository } from 'src/users/repositories/user.repository';
 import { RoleShop } from 'src/auth/roles/role.shop.enum';
+import { SortBy } from '../utils/enum/sort-option.enum'
 
 @Injectable()
 export class ShopService {
@@ -86,12 +87,33 @@ export class ShopService {
         }
     }
 
-    async getProductsShopById (shopId: number): Promise<any> {
+    async getProductsShopById (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
+        const LIMIT = 10
+        const skip = (page -1) * LIMIT
+        let orderBy = {}
+    
+        switch(sortBy) {
+            case SortBy.NAME_ASC:
+                orderBy = { name: 'asc' }
+                break   
+            case SortBy.NAME_DESC:
+                orderBy = { name: 'desc' }
+                break
+            case SortBy.CREATED_AT_ASC:
+                orderBy = { createdAt: 'asc' }
+                break
+            case SortBy.CREATED_AT_DESC:
+                orderBy = { createdAt: 'desc' }
+                break
+        }
 
         const products = await this.prisma.product.findMany({
+            skip: skip,
+            take: LIMIT,
             where: {
                 shop_id: shopId
-            }
+            },
+            orderBy: orderBy
         })
 
         // order by revenue
