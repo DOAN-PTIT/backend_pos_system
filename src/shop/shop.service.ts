@@ -424,4 +424,49 @@ export class ShopService {
         }
     }
 
+    async getCustomers (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
+        try {
+            const LIMIT = 10
+            const skip = (page -1) * LIMIT
+            let orderBy = {}
+    
+            switch(sortBy) {
+                case SortBy.NAME_ASC:
+                    orderBy = { name: 'asc' }
+                    break   
+                case SortBy.NAME_DESC:
+                    orderBy = { name: 'desc' }
+                    break
+                case SortBy.CREATED_AT_ASC:
+                    orderBy = { createdAt: 'asc' }
+                    break
+                case SortBy.CREATED_AT_DESC:
+                    orderBy = { createdAt: 'desc' }
+                    break
+                case SortBy.LAST_PURCHASE_ASC:
+                    orderBy = { last_purchase: 'asc' }
+                    break
+                case SortBy.LAST_PURCHASE_DESC:
+                    orderBy = { last_purchase: 'desc' }
+                    break
+            }
+
+            const customers = await this.prisma.customer.findMany({
+                skip,
+                take: LIMIT,
+                where: {
+                    shopcustomers: {
+                        some: { shop_id: shopId }
+                    }
+                },
+                orderBy: orderBy
+            })
+
+            return customers
+        } catch (error) {
+            console.log(error)
+            throw new BadRequestException(error.message)
+        }
+    }
+
 }

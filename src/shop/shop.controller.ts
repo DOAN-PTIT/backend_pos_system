@@ -29,6 +29,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { AddEmployeeDto } from './dto/add-employee.dto';
 import { GetEmployeesDto } from './dto/get-employees.dto';
 import { AddCustomerDto } from './dto/add-customer.dto';
+import { GetCustomersDto } from './dto/get-customers.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -140,6 +141,14 @@ export class ShopController {
     async addCustomer (@Body() addCustomerDto: AddCustomerDto, @Param('shopId') shopId: number): Promise<any> {
         
         return await this.shopService.addCustomer(addCustomerDto, shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin)
+    @Get(':shopId/customer/all')
+    async getCustomer (@Param('shopId') shopId: number, @Query() getCustomersDto: GetCustomersDto): Promise<any> {
+        const { page, sortBy } = getCustomersDto
+        return await this.shopService.getCustomers(shopId, page, sortBy);
     }
 
 }
