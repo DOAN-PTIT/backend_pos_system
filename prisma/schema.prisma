@@ -79,6 +79,8 @@ model Product {
   description   String?
   note          String?
   image         String
+  retail_price  Int
+  price_at_counter Int
   product_code  String @unique
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now())@db.Timestamptz(6)
@@ -87,6 +89,17 @@ model Product {
   orderitems    OrderItem[]
   shop_id       Int
   shop          Shop @relation(fields: [shop_id], references: [id])
+  categories_id Int?
+  categories    Categories? @relation(fields: [categories_id], references: [id])
+}
+
+model Categories {
+  id            Int     @id @default(autoincrement())
+  name          String
+  description   String
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime @default(now())@db.Timestamptz(6)
+  products      Product[]
 }
 
 model Variation {
