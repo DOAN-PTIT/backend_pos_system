@@ -39,23 +39,18 @@ export class ShopController {
         private shopService: ShopService,
     ) {}
 
+    // Shop general
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
-    @Post('products/:shopId')
-    async getProducts (@Param('shopId') shopId: number, @Query() getProductsDto: GetProductsDto): Promise<any> {
-        const { page, sortBy } = getProductsDto
-        return await this.shopService.getProductsShopById(shopId, page, sortBy);
-    }
-
-    @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
-    @Get(':shopId/employees')
-    async getEmployees (
+    @Post("profile/update/:shopId")
+    @UseInterceptors(FileInterceptor('avatar'))
+    async updateShopProfile (
         @Param('shopId', ParseIntPipe) shopId: number,
-        @Query() getEmployeesDto: GetEmployeesDto
+        @Body() updateShopProfileDto: CreateShopDto,
+        @UploadedFile() avatar: Express.Multer.File
     ): Promise<any> {
-        const { page, sortBy } = getEmployeesDto
-        return await this.shopService.getEmployeesShopById(shopId, page, sortBy);
+
+        return await this.shopService.updateShopProfile(updateShopProfileDto, shopId, avatar);
     }
 
     @Roles(Role.Admin, Role.User)
@@ -84,6 +79,7 @@ export class ShopController {
         return await this.shopService.updateSettingByShopId(shopId, updateShopSettingDto)
     }
 
+    // Products
     @Roles(Role.User, Role.Admin)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Post('create-product/:shopId')
@@ -99,17 +95,13 @@ export class ShopController {
 
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
-    @Post("profile/update/:shopId")
-    @UseInterceptors(FileInterceptor('avatar'))
-    async updateShopProfile (
-        @Param('shopId', ParseIntPipe) shopId: number,
-        @Body() updateShopProfileDto: CreateShopDto,
-        @UploadedFile() avatar: Express.Multer.File
-    ): Promise<any> {
-
-        return await this.shopService.updateShopProfile(updateShopProfileDto, shopId, avatar);
+    @Post('products/:shopId')
+    async getProducts (@Param('shopId') shopId: number, @Query() getProductsDto: GetProductsDto): Promise<any> {
+        const { page, sortBy } = getProductsDto
+        return await this.shopService.getProductsShopById(shopId, page, sortBy);
     }
 
+    // Employees
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin)
     @Post(":shopId/employee/add")
@@ -117,6 +109,17 @@ export class ShopController {
         const { email } = addEmployeeDto
         
         return await this.shopService.addEmployee(email, shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/employees')
+    async getEmployees (
+        @Param('shopId', ParseIntPipe) shopId: number,
+        @Query() getEmployeesDto: GetEmployeesDto
+    ): Promise<any> {
+        const { page, sortBy } = getEmployeesDto
+        return await this.shopService.getEmployeesShopById(shopId, page, sortBy);
     }
     
     @Roles(Role.Admin, Role.User)
@@ -135,6 +138,7 @@ export class ShopController {
         return await this.shopService.removeEmployee(shopUserId)
     }
 
+    // Customers
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin)
     @Post(":shopId/customer/add")
