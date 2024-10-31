@@ -101,6 +101,14 @@ export class ShopController {
         return await this.shopService.getProductsShopById(shopId, page, sortBy);
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/products/:searchKey')
+    async searchProducts (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
+
+        return await this.shopService.searchProducts(shopId, searchKey);
+    }
+
     // Employees
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin)
