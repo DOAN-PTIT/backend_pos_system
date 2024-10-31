@@ -18,6 +18,7 @@ import { Role } from 'src/auth/roles/role.enum';
 import { ShopService } from 'src/shop/shop.service';
 import { CreateShopDto } from 'src/shop/dto/create-shop.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { IntegrateFbShopDto } from 'src/shop/dto/integrate-fb-shop.dto';
 
 @Controller('user')
 export class UsersController {
@@ -47,6 +48,16 @@ export class UsersController {
         const userId = req.user.id;
 
         return await this.shopService.createShop(createShopDto, avatar, userId);
+    }
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(Role.User, Role.Admin)
+    @Post('integrate-fb-shop')
+    async integrateFbShop (@Req() req: Request, @Body() integrateFbShopDto: IntegrateFbShopDto): Promise<any> {
+        const userId = req.user.id;
+        const { name, avatar } = integrateFbShopDto
+        
+        return this.shopService.integrateFbShop(userId, name, avatar);
     }
 
 }

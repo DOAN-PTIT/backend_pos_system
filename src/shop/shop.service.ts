@@ -35,8 +35,8 @@ export class ShopService {
 
         try {
             // check shop name of user duplicate
-            // const foundShop = await this.shopRepository.findShopOfUserByShopName(name, userId)
-            // if (foundShop) throw new BadRequestException(`Shop ${name} already exists`)
+            const foundShop = await this.shopRepository.findShopOfUserByShopName(name, userId)
+            if (foundShop) throw new BadRequestException(`Shop ${name} already exists`)
 
             // get avatar url cloud
             let avatarUrl:any
@@ -519,6 +519,86 @@ export class ShopService {
             console.log(error)
             throw new BadRequestException(error.message)
         }
+    }
+
+    async createOrder (shopId: number, addCustomerDto: AddCustomerDto): Promise<any> {
+        try {
+            // let newOrderCustomerId: number
+
+            // // check customer existed?
+            // const foundCustomer = await this.prisma.customer.findFirst({
+            //     where: {
+            //         OR: [
+            //             { email: addCustomerDto.email },
+            //             { phone_number: addCustomerDto.phone_number}
+            //         ]
+            //     }
+            // })
+            // if (!foundCustomer) {
+            //     const newCustomer = await this.addCustomer(addCustomerDto, shopId)
+            //     newOrderCustomerId = newCustomer.id
+            // } else {
+            //     newOrderCustomerId = foundCustomer.id
+            // }
+
+            // // create new order
+            // const newOrder = await this.prisma.order.create({
+            //     data: {
+
+            //     }
+            // })
+
+
+            // create orderItem
+
+            // return newOrder
+        } catch (error) {
+            console.log(error)
+            throw new BadRequestException(error.message)
+        }
+    }
+
+    async integrateFbShop (userId: number, name: string, avatar: string): Promise<any> {
+        try {
+            // check shop name of user duplicate
+            const foundShop = await this.shopRepository.findShopOfUserByShopName(name, userId)
+            if (foundShop) throw new BadRequestException(`Shop ${name} already exists`)
+
+            // create shop
+            const newShop = await this.prisma.shop.create({
+                data: { 
+                    name: name,
+                    avatar: avatar,
+                    currency: "VND",
+                    description: "No description"
+                }
+            })
+
+            // create shop user
+            await this.prisma.shopUser.create({
+                data: {
+                    user_id: userId,
+                    shop_id: newShop.id,
+                    role: RoleShop.Admin
+                }
+            })
+
+            // create default shop setting
+            await this.prisma.shopSetting.create({
+                data: {
+                    date_format: "DD/MM/YYYY",
+                    location: "Hanoi, Vietnam",
+                    language: "en",
+                    shop_id: newShop.id,
+                }
+            })
+
+            return newShop
+        } catch (error) {
+            console.log(error)
+            throw new BadRequestException(error.message)
+        }
+        
     }
 
 }
