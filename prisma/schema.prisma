@@ -71,6 +71,7 @@ model ShopUser {
   shop_id       Int
   user          User @relation(fields: [user_id], references: [id])
   shop          Shop @relation(fields: [shop_id], references: [id])
+  orders         Order[]
 }
 
 model Product {
@@ -134,10 +135,23 @@ model Order {
   id            Int     @id @default(autoincrement())
   note          String?
   status        Boolean
+  delivery_cost_shop Int
+  discount_percent Int
+  paid          Int
+  total_cost    Int
+  estimated_delivery DateTime @db.Timestamptz(6)
+  recipient_name String
+  recipient_phone_number String
+  delivery_address String
+  delivery_company String
+  tracking_number String
+  delivery_cost Int
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orderitems    OrderItem[]
   customer_id   Int
   customer      Customer @relation(fields: [customer_id], references: [id])
+  shopuser_id   Int
+  shopuser      ShopUser @relation(fields: [shopuser_id], references: [id])
 }
 
 model OrderItem {
