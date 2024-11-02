@@ -139,7 +139,7 @@ model Order {
   discount_percent Int
   paid          Int
   total_cost    Int
-  estimated_delivery DateTime @db.Timestamptz(6)
+  estimated_delivery DateTime @db.Date
   recipient_name String
   recipient_phone_number String
   delivery_address String
