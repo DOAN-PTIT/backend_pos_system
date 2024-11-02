@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { ShopModule } from './shop/shop.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CustomerModule } from './customer/customer.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     UsersModule,
     SocialModule,
     ShopModule,
-    CloudinaryModule
+    CloudinaryModule,
+    CustomerModule
   ],
   controllers: [AppController],
   providers: [AppService],

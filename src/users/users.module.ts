@@ -9,9 +9,10 @@ import { AuthService } from 'src/auth/auth.service';
 import { ShopModule } from 'src/shop/shop.module';
 import { ShopService } from 'src/shop/shop.service';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { CustomerModule } from 'src/customer/customer.module';
 
 @Module({
-  imports: [AuthModule, ShopModule, CloudinaryModule],
+  imports: [AuthModule, ShopModule, CloudinaryModule, CustomerModule],
   providers: [
     UsersService, 
     PrismaService, 

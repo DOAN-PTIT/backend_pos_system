@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, IsEnum, IsOptional, IsDateString } from "class-validator";
+import { Transform } from 'class-transformer';
 
 enum Gender {
     MALE = "MALE",
@@ -33,5 +34,6 @@ export class AddCustomerDto {
 
     @IsDateString()
     @IsOptional()
+    @Transform(({ value }) => value ?? null)
     last_purchase?: string;
 }

@@ -12,6 +12,8 @@ import { UserRepository } from 'src/users/repositories/user.repository';
 import { RoleShop } from 'src/auth/roles/role.shop.enum';
 import { SortBy } from '../utils/enum/sort-option.enum'
 import { AddCustomerDto } from './dto/add-customer.dto';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { CustomerService } from 'src/customer/customer.service';
 
 @Injectable()
 export class ShopService {
@@ -21,7 +23,8 @@ export class ShopService {
         private readonly shopRepository: ShopRepository,
         private cloudinary: CloudinaryService,
         private configService: ConfigService,
-        private userRepository: UserRepository
+        private userRepository: UserRepository,
+        private customerService: CustomerService
     ) {}
 
     async getListShop(userId: number) {
@@ -403,7 +406,7 @@ export class ShopService {
                     address: address,
                     date_of_birth: new Date(date_of_birth),
                     phone_number: phone_number,
-                    last_purchase: new Date(last_purchase)
+                    last_purchase: last_purchase ? new Date(last_purchase) : null,
                 }
             })
             if (!newCustomer) throw new BadRequestException('Cannot add customer')
@@ -521,37 +524,60 @@ export class ShopService {
         }
     }
 
-    async createOrder (shopId: number, addCustomerDto: AddCustomerDto): Promise<any> {
+    async createOrder (shopId: number, createOrderDto: CreateOrderDto): Promise<any> {
         try {
-            // let newOrderCustomerId: number
+            const { 
+                note, delivery_address, delivery_company, delivery_cost, delivery_cost_shop,
+                discount_percent, estimated_delivery, tracking_number, paid, total_cost,
+                recipient_name, recipient_phone_number, createdAt, products_order,
+                shopuser_id, add_customer
+            } = createOrderDto
+            let newOrderCustomerId: number
 
-            // // check customer existed?
-            // const foundCustomer = await this.prisma.customer.findFirst({
-            //     where: {
-            //         OR: [
-            //             { email: addCustomerDto.email },
-            //             { phone_number: addCustomerDto.phone_number}
-            //         ]
-            //     }
-            // })
-            // if (!foundCustomer) {
-            //     const newCustomer = await this.addCustomer(addCustomerDto, shopId)
-            //     newOrderCustomerId = newCustomer.id
-            // } else {
-            //     newOrderCustomerId = foundCustomer.id
-            // }
+            // check customer existed?
+            const foundCustomer = await this.customerService.findByEmailOrPhoneNumberForShop(
+                shopId, add_customer.email, add_customer.phone_number
+            )
 
-            // // create new order
-            // const newOrder = await this.prisma.order.create({
-            //     data: {
+            if (!foundCustomer) {
+                const newCustomer = await this.addCustomer(add_customer, shopId)
+                newOrderCustomerId = newCustomer.id
+            } else {
+                // we can update user exist here!!!
+                // now is old customer
+                newOrderCustomerId = foundCustomer.id
+            }
 
-            //     }
-            // })
-
+            // create new order
+            const newOrder = await this.prisma.order.create({
+                data: {
+                    delivery_address, delivery_company, 
+                    delivery_cost, delivery_cost_shop, 
+                    discount_percent, tracking_number, 
+                    paid, total_cost, recipient_name,
+                    recipient_phone_number, note,
+                    shopuser_id,
+                    status: false,
+                    estimated_delivery: new Date(estimated_delivery), 
+                    createdAt: new Date(createdAt), 
+                    customer_id: newOrderCustomerId,
+                }
+            })
 
             // create orderItem
+            await Promise.all(
+                products_order.map(productOrder => {
+                    return this.prisma.orderItem.create({
+                        data: {
+                            product_id: productOrder.product_id,
+                            quantity: productOrder.quantity,
+                            order_id: newOrder.id
+                        }
+                    })
+                })
+            )
 
-            // return newOrder
+            return newOrder
         } catch (error) {
             console.log(error)
             throw new BadRequestException(error.message)
