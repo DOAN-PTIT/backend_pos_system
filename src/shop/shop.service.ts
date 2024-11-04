@@ -111,20 +111,27 @@ export class ShopService {
                 break
         }
 
-        const products = await this.prisma.product.findMany({
-            skip: skip,
-            take: LIMIT,
-            where: {
-                shop_id: shopId
-            },
-            orderBy: orderBy
-        })
+        const [products, totalCount] = await Promise.all([
+            this.prisma.product.findMany({
+                skip: skip,
+                take: LIMIT,
+                where: {
+                    shop_id: shopId
+                },
+                orderBy: orderBy
+            }),
+            this.prisma.product.count({
+                where: {
+                    shop_id: shopId
+                },
+            })
+        ]) 
 
         // order by revenue
 
         // order by profit
 
-        return products
+        return { products, totalCount }
     }
 
     async getEmployeesShopById (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
@@ -148,25 +155,36 @@ export class ShopService {
         }
 
         try {
-            const employees = await this.prisma.user.findMany({
-                skip,
-                take: LIMIT,
-                where: {
-                    shopusers: { 
-                        some: { 
-                            shop_id: shopId, 
-                            // role: Role.Employee 
-                        }
+            const [employees, totalCount] = await Promise.all([
+                this.prisma.user.findMany({
+                    skip,
+                    take: LIMIT,
+                    where: {
+                        shopusers: { 
+                            some: { 
+                                shop_id: shopId, 
+                                // role: Role.Employee 
+                            }
+                        },
                     },
-                },
-                select: {
-                    id: true, name: true, email: true, phone_number: true, date_of_birth: true, createdAt: true
-                },
-                orderBy: orderBy
-            })
-            if (employees == undefined) throw new BadRequestException('Cannot get list employees')
+                    select: {
+                        id: true, name: true, email: true, phone_number: true, date_of_birth: true, createdAt: true
+                    },
+                    orderBy: orderBy
+                }),
+                this.prisma.user.count({
+                    where: {
+                        shopusers: { 
+                            some: { 
+                                shop_id: shopId, 
+                                // role: Role.Employee 
+                            }
+                        },
+                    },
+                })
+            ])
 
-            return employees
+            return { employees, totalCount }
         } catch (error) {
             console.log(error)
             throw new BadRequestException(error.message)
@@ -454,18 +472,27 @@ export class ShopService {
                     break
             }
 
-            const customers = await this.prisma.customer.findMany({
-                skip,
-                take: LIMIT,
-                where: {
-                    shopcustomers: {
-                        some: { shop_id: shopId }
-                    }
-                },
-                orderBy: orderBy
-            })
+            const [customers, totalCount] = await Promise.all([
+                this.prisma.customer.findMany({
+                    skip,
+                    take: LIMIT,
+                    where: {
+                        shopcustomers: {
+                            some: { shop_id: shopId }
+                        }
+                    },
+                    orderBy: orderBy
+                }),
+                this.prisma.customer.count({
+                    where: {
+                        shopcustomers: {
+                            some: { shop_id: shopId }
+                        }
+                    },
+                })
+            ]) 
 
-            return customers
+            return { customers, totalCount }
         } catch (error) {
             console.log(error)
             throw new BadRequestException(error.message)
