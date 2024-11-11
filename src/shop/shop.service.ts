@@ -236,16 +236,13 @@ export class ShopService {
 
     async createProduct (
         createProductDto: CreateProductDto, 
-        shopId: number, 
-        image: Express.Multer.File
+        shopId: number,
     ): Promise<any> {
         const {
             name, 
-            description = '', 
+            description = null, 
             note, 
-            product_code = '',
-            retail_price,
-            price_at_counter,
+            product_code = null,
             categories_id = null
         } = createProductDto
 
@@ -258,29 +255,13 @@ export class ShopService {
             })
             if (foundProductByCode) throw new BadRequestException('Product_code existed')
 
-            let imageUrl:any
-            if (image) {
-                const imageResponse = await this.cloudinary.uploadImage(image)
-                .catch(() => {
-                    console.log('Invalid file type')
-                    throw new BadRequestException('Invalid file type');
-                })
-                
-                imageUrl = imageResponse.url
-            } else {
-                imageUrl = this.configService.get<string>('PRODUCT_IMAGE_DEFAULT')
-            }
-
             const newProduct = await this.prisma.product.create({
                 data: {
                     name,
                     description,
                     note,
                     product_code,
-                    image: imageUrl,
                     shop_id: shopId,
-                    retail_price,
-                    price_at_counter,
                     categories_id,
                 }
             })

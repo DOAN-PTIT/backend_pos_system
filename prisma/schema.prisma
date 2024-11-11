@@ -79,9 +79,6 @@ model Product {
   name          String
   description   String?
   note          String?
-  image         String
-  retail_price  Int
-  price_at_counter Int
   product_code  String @unique
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now())@db.Timestamptz(6)
@@ -109,7 +106,7 @@ model Variation {
   image         String
   amount        Int
   barcode       String  @unique
-  product_code  String  @unique
+  variation_code  String  @unique
   price_at_counter  Int
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)

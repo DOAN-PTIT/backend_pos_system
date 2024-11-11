@@ -84,14 +84,12 @@ export class ShopController {
     @Roles(Role.User, Role.Admin)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Post('create-product/:shopId')
-    @UseInterceptors(FileInterceptor('image'))
     async createShop (
         @Param('shopId', ParseIntPipe) shopId: number, 
-        @Body() createProductDto: CreateProductDto, 
-        @UploadedFile() image: Express.Multer.File
+        @Body() createProductDto: CreateProductDto,
     ): Promise<any> {
         
-        return await this.shopService.createProduct(createProductDto, shopId, image);
+        return await this.shopService.createProduct(createProductDto, shopId);
     }
 
     @Roles(Role.Admin, Role.User)

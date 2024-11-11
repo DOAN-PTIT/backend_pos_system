@@ -19,16 +19,6 @@ export class CreateProductDto {
     product_code: string;
 
     @IsNumber()
-    @IsNotEmpty()
-    @Transform(({ value }) => parseInt(value))
-    retail_price: number;
-
-    @IsNumber()
-    @IsNotEmpty()
-    @Transform(({ value }) => parseInt(value))
-    price_at_counter: number;
-
-    @IsNumber()
     @IsOptional()
     categories_id: number
 }
