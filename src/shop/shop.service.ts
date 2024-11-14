@@ -29,6 +29,13 @@ export class ShopService {
         private customerService: CustomerService
     ) {}
 
+    async getShopInfo (shopId: number): Promise<any> {
+        const shopInfo = await this.shopRepository.findShopById(shopId);
+        if (!shopInfo) throw new BadRequestException('Shop not found or no logger exist')
+
+        return shopInfo
+    }
+
     async getListShop(userId: number) {
         let listShop = []
         listShop = await this.shopRepository.findShopByUserId(userId)

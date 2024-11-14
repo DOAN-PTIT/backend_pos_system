@@ -63,6 +63,12 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
+    @Get(":shopId")
+    async getShopInfo (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
+        return await this.shopService.getShopInfo(shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Get("setting/:shopId")
     async getShopSetting (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
