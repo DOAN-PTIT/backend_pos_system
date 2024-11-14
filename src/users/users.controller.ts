@@ -55,9 +55,9 @@ export class UsersController {
     @Post('integrate-fb-shop')
     async integrateFbShop (@Req() req: Request, @Body() integrateFbShopDto: IntegrateFbShopDto): Promise<any> {
         const userId = req.user.id;
-        const { name, avatar } = integrateFbShopDto
+        const { name, avatar, fb_shop_id } = integrateFbShopDto
         
-        return this.shopService.integrateFbShop(userId, name, avatar);
+        return this.shopService.integrateFbShop(userId, name, avatar, fb_shop_id);
     }
 
 }

@@ -80,6 +80,13 @@ export class ShopController {
         return await this.shopService.updateSettingByShopId(shopId, updateShopSettingDto)
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin)
+    @Delete(":shopId")
+    async deleteShop (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
+        return await this.shopService.deleteShop(shopId)
+    }
+
     // Products
     @Roles(Role.User, Role.Admin)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)

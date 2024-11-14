@@ -8,4 +8,8 @@ export class IntegrateFbShopDto {
     @IsString()
     @IsNotEmpty()
     avatar: string;
+
+    @IsString()
+    @IsNotEmpty()
+    fb_shop_id: string;
 }

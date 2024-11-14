@@ -91,6 +91,34 @@ export class ShopService {
         }
     }
 
+    async deleteShop (shopId: number): Promise<any> {
+        try {
+            await this.prisma.$transaction([
+                // delete shop
+    
+                // delete shopCustomer
+    
+                // delete product
+    
+                // delete productVariation
+    
+                // delete shopSetting
+    
+                // delete shopUser
+
+                // delete promotion
+                
+                // promotionItem
+                
+            ]);
+
+            return { message: "Delete shop success"}
+        } catch (error) {
+            console.log(error)
+            throw new BadRequestException('Delete shop fail and will rollback')
+        }
+    }
+
     async getProductsShopById (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
         const LIMIT = 10
         const skip = (page -1) * LIMIT
@@ -592,7 +620,7 @@ export class ShopService {
         }
     }
 
-    async integrateFbShop (userId: number, name: string, avatar: string): Promise<any> {
+    async integrateFbShop (userId: number, name: string, avatar: string, fb_shop_id: string): Promise<any> {
         try {
             // check shop name of user duplicate
             const foundShop = await this.shopRepository.findShopOfUserByShopName(name, userId)
@@ -603,6 +631,7 @@ export class ShopService {
                 data: { 
                     name: name,
                     avatar: avatar,
+                    fb_shop_id,
                     currency: "VND",
                     description: "No description"
                 }
