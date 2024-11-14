@@ -31,6 +31,7 @@ import { GetEmployeesDto } from './dto/get-employees.dto';
 import { AddCustomerDto } from './dto/add-customer.dto';
 import { GetCustomersDto } from './dto/get-customers.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateVariationDto } from './dto/create-variation.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -91,7 +92,7 @@ export class ShopController {
     @Roles(Role.User, Role.Admin)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
     @Post('create-product/:shopId')
-    async createShop (
+    async createProduct (
         @Param('shopId', ParseIntPipe) shopId: number, 
         @Body() createProductDto: CreateProductDto,
     ): Promise<any> {
@@ -113,6 +114,19 @@ export class ShopController {
     async searchProducts (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
 
         return await this.shopService.searchProducts(shopId, searchKey);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/:productId/variation')
+    @UseInterceptors(FileInterceptor('image'))
+    async createVariation (
+        @Param('shopId') shopId: number, 
+        @Param('productId') product_id: number,
+        @Body() createVariationDto: CreateVariationDto,
+        @UploadedFile() image?: Express.Multer.File
+    ): Promise<any> {
+        return await this.shopService.createVariation(shopId, product_id, image, createVariationDto);
     }
 
     // Employees

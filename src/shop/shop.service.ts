@@ -14,6 +14,8 @@ import { SortBy } from '../utils/enum/sort-option.enum'
 import { AddCustomerDto } from './dto/add-customer.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CustomerService } from 'src/customer/customer.service';
+import { CreateVariationDto } from './dto/create-variation.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ShopService {
@@ -662,6 +664,55 @@ export class ShopService {
             throw new BadRequestException(error.message)
         }
         
+    }
+
+    async createVariation (
+        shopId: number, 
+        product_id: number,
+        image: Express.Multer.File | undefined,
+        createVariationDto: CreateVariationDto
+    ): Promise<any> {
+        try {
+            const { 
+                retail_price, amount, barcode, price_at_counter, variation_code
+            } = createVariationDto
+
+            const foundProduct = await this.prisma.product.findFirst({
+                where: { id: product_id }
+            })
+            if (!foundProduct) throw new BadRequestException('Product not found')
+
+            // get avatar url cloud
+            let imageUrl:any
+            if (image) {
+                const avatarResponse = await this.cloudinary.uploadImage(image)
+                .catch(() => {
+                    console.log('Invalid file type')
+                    throw new BadRequestException('Invalid file type');
+                })
+                
+                imageUrl = avatarResponse.url
+            } else {
+                imageUrl = this.configService.get<string>('PRODUCT_IMAGE_DEFAULT')
+            }
+
+            const newVariation = await this.prisma.variation.create({
+                data: {
+                    retail_price, 
+                    amount, 
+                    barcode, 
+                    price_at_counter, 
+                    product_id, 
+                    variation_code,
+                    image: imageUrl
+                } as Prisma.VariationUncheckedCreateInput
+            })
+
+            return newVariation
+        } catch (error) {
+            console.log(error)
+            throw new BadRequestException('Create variation fail')
+        }
     }
 
 }
