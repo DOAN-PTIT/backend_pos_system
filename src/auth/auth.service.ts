@@ -49,8 +49,8 @@ export class AuthService {
         return { accessToken, refreshToken };
     }
 
-    async genAccessTokenByRefreshToken (@Req() req: Request): Promise<{accessToken: string}> {
-        const refreshToken = req.cookies['refresh_token'];
+    async genAccessTokenByRefreshToken (refreshToken: string): Promise<{accessToken: string}> {
+        // const refreshToken = req.cookies['refresh_token'];
 
         if (!refreshToken) {
             throw new UnauthorizedException('Refresh token not found, pls login again');
@@ -105,11 +105,12 @@ export class AuthService {
         const tokenPair = await this.genTokensPair(foundUser) //???
 
         // Set refresh_token in HTTP-only cookie
-        res.cookie('refresh_token', tokenPair.refreshToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-        });
+        // res.cookie('refresh_token', tokenPair.refreshToken, {
+        //     httpOnly: true,
+        //     sameSite: 'strict',
+        //     secure: false,
+        //     maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days,
+        // });
 
         return {
             user: {
@@ -126,12 +127,13 @@ export class AuthService {
 
     async logout (@Res({ passthrough: true }) res: Response): Promise<any> {
         try {
-            res.clearCookie('refresh_token', {
-                httpOnly: true,
-                // secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                path: '/',
-            });
+            // res.clearCookie('refresh_token', {
+            //     httpOnly: true,
+            //     // secure: process.env.NODE_ENV === 'production',
+            //     sameSite: 'strict',
+            //     secure: false,
+            //     path: '/',
+            // });
 
             return { message: 'Logout successfull'}
         } catch (err) {

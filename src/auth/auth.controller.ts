@@ -34,12 +34,12 @@ export class AuthController {
 
     @Post('refresh-token')
     @HttpCode(HttpStatus.OK)
-    async refreshToken(@Req() req: Request): Promise<{ accessToken: string }> {
+    async refreshToken(@Body() refreshToken: string): Promise<{ accessToken: string }> {
 
-        return await this.service.genAccessTokenByRefreshToken(req)
+        return await this.service.genAccessTokenByRefreshToken(refreshToken)
     }
 
-    @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
     @Post('logout')
     @HttpCode(HttpStatus.OK)
     async logout (@Res({passthrough: true}) res: Response) {
