@@ -34,8 +34,8 @@ export class AuthController {
 
     @Post('refresh-token')
     @HttpCode(HttpStatus.OK)
-    async refreshToken(@Body() refreshToken: string): Promise<{ accessToken: string }> {
-
+    async refreshToken(@Body() data: any): Promise<{ accessToken: string }> {
+        const { refreshToken } = data;
         return await this.service.genAccessTokenByRefreshToken(refreshToken)
     }
 
