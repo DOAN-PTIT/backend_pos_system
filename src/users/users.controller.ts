@@ -43,11 +43,11 @@ export class UsersController {
     async createShop (
         @Req() req: Request, 
         @Body() createShopDto: CreateShopDto, 
-        @UploadedFile() avatar: Express.Multer.File
+        @UploadedFile() avatar?: Express.Multer.File
     ): Promise<any> {
         const userId = req.user.id;
 
-        return await this.shopService.createShop(createShopDto, avatar, userId);
+        return await this.shopService.createShop(createShopDto, userId, avatar);
     }
 
     @UseGuards(AuthGuard, RolesGuard)

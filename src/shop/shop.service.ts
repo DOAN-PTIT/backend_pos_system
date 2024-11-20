@@ -42,7 +42,7 @@ export class ShopService {
         return listShop
     }
 
-    async createShop (createShopDto: CreateShopDto, avatar: Express.Multer.File, userId: number) {
+    async createShop (createShopDto: CreateShopDto, userId: number, avatar?: Express.Multer.File, ) {
         const { name } = createShopDto
 
         try {
@@ -606,6 +606,7 @@ export class ShopService {
                     estimated_delivery: new Date(estimated_delivery), 
                     createdAt: new Date(createdAt), 
                     customer_id: newOrderCustomerId,
+                    shop_id: shopId
                 }
             })
 
