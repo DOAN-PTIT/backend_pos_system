@@ -48,6 +48,7 @@ model Shop {
   products      Product[]
   shopsetting   ShopSetting?
   shopcustomers ShopCustomer[]
+  orders        Order[]
 }
 
 model ShopSetting {
@@ -150,6 +151,8 @@ model Order {
   customer      Customer @relation(fields: [customer_id], references: [id])
   shopuser_id   Int
   shopuser      ShopUser @relation(fields: [shopuser_id], references: [id])
+  shop_id       Int
+  shop          Shop @relation(fields: [shop_id], references: [id])
 }
 
 model OrderItem {

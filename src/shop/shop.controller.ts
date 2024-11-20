@@ -32,6 +32,7 @@ import { AddCustomerDto } from './dto/add-customer.dto';
 import { GetCustomersDto } from './dto/get-customers.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateVariationDto } from './dto/create-variation.dto';
+import { OrderService } from 'src/order/order.service';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -39,6 +40,7 @@ export class ShopController {
 
     constructor (
         private shopService: ShopService,
+        private orderService: OrderService
     ) {}
 
     // Shop general
@@ -206,4 +208,10 @@ export class ShopController {
         return await this.shopService.createOrder(shopId, createOrderDto);
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/orders')
+    async getOrders(@Query() params: { page: number, page_size: number, shop_id: number }): Promise<any> {
+        return await this.orderService.getListOrder(params)
+    }
 }
