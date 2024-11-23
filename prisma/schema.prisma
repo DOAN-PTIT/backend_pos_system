@@ -158,6 +158,7 @@ model Order {
 model OrderItem {
   id            Int     @id @default(autoincrement())
   quantity      Int
+  note          String?
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   product_id    Int
   product       Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
