@@ -118,10 +118,10 @@ export class ShopController {
 
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Admin, RoleShop.Employee)
-    @Get(':shopId/products/:searchKey')
-    async searchProducts (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
+    @Get(':shopId/:searchKey')
+    async searchVariations (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
 
-        return await this.shopService.searchProducts(shopId, searchKey);
+        return await this.shopService.searchVariations(shopId, searchKey);
     }
 
     @Roles(Role.Admin, Role.User)

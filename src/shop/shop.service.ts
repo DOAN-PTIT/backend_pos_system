@@ -542,28 +542,28 @@ export class ShopService {
         }
     }
 
-    async searchProducts (shopId: number, searchKey: string = ''): Promise<any> {
+    async searchVariations (shopId: number, searchKey: string = ''): Promise<any> {
         try {
             // check product stock (option) ???
 
-            return await this.prisma.product.findMany({
+            return await this.prisma.variation.findMany({
                 where: {
                     AND: [
-                        { shop_id: shopId },
+                        { product: {shop_id: shopId} },
                         {
                             OR: [
-                                { name: { contains: searchKey, mode: 'insensitive' } },
-                                { product_code: { contains: searchKey, mode: 'insensitive' } }
+                                {product: { name: { contains: searchKey, mode: 'insensitive' } }},
+                                { variation_code: { contains: searchKey, mode: 'insensitive' } }
                             ]
                         }
                     ]
                 },
                 include: {
                     // shop: true,
-                    categories: true
+                    product: true
                 },
                 orderBy: {
-                    name: 'asc'
+                    product: {name: 'asc'}
                 }
             });
         } catch (error) {
