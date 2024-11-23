@@ -102,24 +102,13 @@ export class ShopService {
 
     async deleteShop (shopId: number): Promise<any> {
         try {
-            await this.prisma.$transaction([
-                // delete shop
-    
-                // delete shopCustomer
-    
-                // delete product
-    
-                // delete productVariation
-    
-                // delete shopSetting
-    
-                // delete shopUser
-
-                // delete promotion
-                
-                // promotionItem
-                
-            ]);
+            // delete shop
+            await this.prisma.shop.delete({
+                where: {
+                    id: shopId,
+                }
+            })
+            // transaction delete relation data ... (onDelete: Cascade)
 
             return { message: "Delete shop success"}
         } catch (error) {
