@@ -155,7 +155,10 @@ export class ShopService {
                 where: {
                     shop_id: shopId
                 },
-                orderBy: orderBy
+                orderBy: orderBy,
+                include: {
+                    variations: true,
+                }
             }),
             this.prisma.product.count({
                 where: {
@@ -686,7 +689,7 @@ export class ShopService {
             } = createVariationDto
 
             const foundProduct = await this.prisma.product.findFirst({
-                where: { id: product_id }
+                where: { id: product_id, AND: { shop_id: shopId } }
             })
             if (!foundProduct) throw new BadRequestException('Product not found')
 
