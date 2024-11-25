@@ -33,6 +33,7 @@ import { GetCustomersDto } from './dto/get-customers.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateVariationDto } from './dto/create-variation.dto';
 import { OrderService } from 'src/order/order.service';
+import { CustomerService } from 'src/customer/customer.service';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -40,7 +41,8 @@ export class ShopController {
 
     constructor (
         private shopService: ShopService,
-        private orderService: OrderService
+        private orderService: OrderService,
+        private customerService: CustomerService
     ) {}
 
     // Shop general
@@ -204,6 +206,13 @@ export class ShopController {
     async removeCustomer (@Param('shopId') shopId: number, @Param('customerId') customerId: number): Promise<any> {
         
         return await this.shopService.removeCustomer(shopId, customerId);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/customers')
+    async searchCustomer(@Req() req: Request): Promise<any> {
+        return await this.customerService.searchCustomer(req.query as any);
     }
 
     // Orders
