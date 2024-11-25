@@ -531,6 +531,36 @@ export class ShopService {
         }
     }
 
+    async searchProducts (shopId: number, searchKey: string = ''): Promise<any> {
+        try {
+            // check product stock (option) ???
+
+            return await this.prisma.product.findMany({
+                where: {
+                    AND: [
+                        { shop_id: shopId },
+                        {
+                            OR: [
+                                { name: { contains: searchKey, mode: 'insensitive' } },
+                                { product_code: { contains: searchKey, mode: 'insensitive' } }
+                            ]
+                        }
+                    ]
+                },
+                include: {
+                    // shop: true,
+                    categories: true
+                },
+                orderBy: {
+                    name: 'asc'
+                }
+            });
+        } catch (error) {
+            console.log(error)
+            throw new BadRequestException(error.message)
+        }
+    }
+
     async searchVariations (shopId: number, searchKey: string = ''): Promise<any> {
         try {
             // check product stock (option) ???
