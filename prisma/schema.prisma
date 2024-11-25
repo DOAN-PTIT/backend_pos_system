@@ -145,6 +145,7 @@ model Order {
   delivery_company String
   tracking_number String
   delivery_cost Int
+  surcharge     Int
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orderitems    OrderItem[]
   customer_id   Int

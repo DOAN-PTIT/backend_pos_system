@@ -56,6 +56,10 @@ export class CreateOrderDto {
     @IsNotEmpty()
     total_cost: number;             // tổng phải thanh toán
 
+    @IsNumber()
+    @IsNotEmpty()
+    surcharge: number;              // phụ thu
+
     @IsString()
     @IsNotEmpty()
     recipient_name: string;         // người nhận
@@ -71,7 +75,7 @@ export class CreateOrderDto {
     @ValidateNested({ each: true })
     @Type(() => ProductOrderDto)
     @IsNotEmpty()
-    products_order: ProductOrderDto[]            // danh sách sản phẩm
+    products_order: ProductOrderDto[] // danh sách sản phẩm
 
     @IsNumber()
     @IsNotEmpty()

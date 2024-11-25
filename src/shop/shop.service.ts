@@ -597,7 +597,7 @@ export class ShopService {
                 note, delivery_address, delivery_company, delivery_cost, delivery_cost_shop,
                 discount_percent, estimated_delivery, tracking_number, paid, total_cost,
                 recipient_name, recipient_phone_number, createdAt, products_order,
-                shopuser_id, add_customer
+                shopuser_id, add_customer, surcharge
             } = createOrderDto
             let newOrderCustomerId: number
 
@@ -623,7 +623,7 @@ export class ShopService {
                     discount_percent, tracking_number, 
                     paid, total_cost, recipient_name,
                     recipient_phone_number, note,
-                    shopuser_id,
+                    surcharge, shopuser_id,
                     status: false,
                     estimated_delivery: new Date(estimated_delivery), 
                     createdAt: new Date(createdAt), 
