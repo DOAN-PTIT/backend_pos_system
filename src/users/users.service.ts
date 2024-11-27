@@ -24,7 +24,10 @@ export class UsersService {
     async getProfileByUserId (id: number): Promise<any> {
         let userProfile: any
         try {
-            userProfile = await this.UserRepository.findUserById(id);
+            const { password, ...user } = await this.prisma.user.findUnique({
+                where: { id }
+            });
+            return user
         } catch (err) {
             console.error(err);
             throw new NotFoundException('User profile not found')
