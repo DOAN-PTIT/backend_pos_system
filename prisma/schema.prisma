@@ -24,6 +24,8 @@ model User {
   email         String  @unique
   name          String
   password      String
+  avatar        String?
+  language      String?
   phone_number  String?
   fb_id         String?
   access_token  String?

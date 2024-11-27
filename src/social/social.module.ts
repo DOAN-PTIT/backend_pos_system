@@ -8,6 +8,7 @@ import { UserRepository } from 'src/users/repositories/user.repository';
 import { PrismaService } from 'src/database/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Module({
   imports: [UsersModule],
@@ -20,6 +21,7 @@ import { JwtService } from '@nestjs/jwt';
     PrismaService,
     AuthService,
     JwtService,
+    CloudinaryService
   ],
 })
 export class SocialModule {}

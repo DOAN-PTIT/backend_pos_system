@@ -5,6 +5,7 @@ import { UsersService } from 'src/users/users.service';
 import { UserRepository } from 'src/users/repositories/user.repository';
 import { PrismaService } from 'src/database/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Module({
   providers: [
@@ -13,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
     UsersService, 
     UserRepository, 
     JwtService,
+    CloudinaryService
   ],
   controllers: [AuthController],
   exports: [AuthService, JwtService]

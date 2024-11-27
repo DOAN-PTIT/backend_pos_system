@@ -42,7 +42,7 @@ export class ShopService {
         return listShop
     }
 
-    async createShop (createShopDto: CreateShopDto, userId: number, avatar?: Express.Multer.File, ) {
+    async createShop (createShopDto: CreateShopDto, userId: number, avatar?: Express.Multer.File) {
         const { name } = createShopDto
 
         try {
