@@ -79,7 +79,7 @@ export class ShopService {
                 data: {
                     user_id: userId,
                     shop_id: newShop.id,
-                    role: RoleShop.Admin
+                    role: RoleShop.Owner
                 }
             })
 
@@ -368,6 +368,13 @@ export class ShopService {
 
     async removeEmployee(shopUserId: number): Promise<any> {
         try {
+            const foundShopUser = await this.prisma.shopUser.findUnique({ 
+                where: { id: shopUserId } 
+            })
+            if (foundShopUser.role === RoleShop.Owner) {
+                throw new BadRequestException('Cannot remove Shop Owner')
+            }
+
             await this.prisma.shopUser.delete({
                 where: { id: shopUserId }
             })

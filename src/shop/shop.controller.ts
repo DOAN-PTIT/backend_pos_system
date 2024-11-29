@@ -34,6 +34,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateVariationDto } from './dto/create-variation.dto';
 import { OrderService } from 'src/order/order.service';
 import { CustomerService } from 'src/customer/customer.service';
+import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -47,7 +48,7 @@ export class ShopController {
 
     // Shop general
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post("profile/update/:shopId")
     @UseInterceptors(FileInterceptor('avatar'))
     async updateShopProfile (
@@ -73,7 +74,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Get("setting/:shopId")
     async getShopSetting (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
 
@@ -81,7 +82,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post("setting/update/:shopId")
     async updateShopSetting (
         @Param('shopId', ParseIntPipe) shopId: number,
@@ -92,7 +93,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Delete(":shopId")
     async deleteShop (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
         return await this.shopService.deleteShop(shopId)
@@ -100,7 +101,7 @@ export class ShopController {
 
     // Products
     @Roles(Role.User, Role.Admin)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post('create-product/:shopId')
     async createProduct (
         @Param('shopId', ParseIntPipe) shopId: number, 
@@ -111,7 +112,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post('products/:shopId')
     async getProducts (@Param('shopId') shopId: number, @Query() getProductsDto: GetProductsDto): Promise<any> {
         const { page, sortBy } = getProductsDto
@@ -119,7 +120,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Get(':shopId/products/:searchKey')
     async searchProducts (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
         return await this.shopService.searchProducts(shopId, searchKey);
@@ -127,14 +128,14 @@ export class ShopController {
 
     // Variations
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Get(':shopId/variation/:searchKey')
     async searchVariations (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
         return await this.shopService.searchVariations(shopId, searchKey);
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post(':shopId/:productId/variation')
     @UseInterceptors(FileInterceptor('image'))
     async createVariation (
@@ -148,7 +149,7 @@ export class ShopController {
 
     // Employees
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Post(":shopId/employee/add")
     async addEmployee (@Body() addEmployeeDto: AddEmployeeDto, @Param('shopId') shopId: number): Promise<any> {
         const { email } = addEmployeeDto
@@ -157,7 +158,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Get(':shopId/employees')
     async getEmployees (
         @Param('shopId', ParseIntPipe) shopId: number,
@@ -168,7 +169,7 @@ export class ShopController {
     }
     
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Get(":shopId/employee/:employId/detail")
     async getDetailEmployee (@Param('shopId') shopId: number, @Param('employId') userId: number): Promise<any> {
         
@@ -176,7 +177,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Post(":shopId/employee/:shopUserId/remove")
     async removeEmployee (@Param('shopUserId') shopUserId: number): Promise<any> {
         
@@ -185,7 +186,7 @@ export class ShopController {
 
     // Customers
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Post(":shopId/customer/add")
     async addCustomer (@Body() addCustomerDto: AddCustomerDto, @Param('shopId') shopId: number): Promise<any> {
         
@@ -193,7 +194,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Get(':shopId/customer/all')
     async getCustomer (@Param('shopId') shopId: number, @Query() getCustomersDto: GetCustomersDto): Promise<any> {
         const { page, sortBy } = getCustomersDto
@@ -201,7 +202,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Get(':shopId/customer/:customerId/remove')
     async removeCustomer (@Param('shopId') shopId: number, @Param('customerId') customerId: number): Promise<any> {
         
@@ -209,7 +210,7 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post(':shopId/customers')
     async searchCustomer(@Req() req: Request): Promise<any> {
         return await this.customerService.searchCustomer(req.query as any);
@@ -217,7 +218,7 @@ export class ShopController {
 
     // Orders
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Post(':shopId/order/create')
     async createOrder (@Param('shopId') shopId: number, @Body() createOrderDto: CreateOrderDto): Promise<any> {
 
@@ -225,9 +226,16 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Admin, RoleShop.Employee)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Get(':shopId/orders')
     async getOrders(@Query() params: { page: number, page_size: number, shop_id: number }): Promise<any> {
         return await this.orderService.getListOrder(params)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/order/:orderId')
+    async updateOrder (@Param('orderId') orderId: number, @Body() body: UpdateOrderDto) {
+        return await this.orderService.updateOrder(orderId, body)
     }
 }

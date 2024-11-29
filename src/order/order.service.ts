@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { parse_to_int } from 'src/utils/tools';
+import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -46,4 +47,11 @@ export class OrderService {
       data,
     };
   }
+
+	async updateOrder (id: number, updateOrder: UpdateOrderDto) {
+		return await this.prisma.order.update({
+			where: { id },
+			data: updateOrder
+		})
+	}
 }
