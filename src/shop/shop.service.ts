@@ -631,7 +631,6 @@ export class ShopService {
                     shop_id: shopId
                 }
             })
-
             // create orderItem
             await Promise.all(
                 products_order.map(productOrder => {
@@ -639,7 +638,8 @@ export class ShopService {
                         data: {
                             product_id: productOrder.product_id,
                             quantity: productOrder.quantity,
-                            order_id: newOrder.id
+                            order_id: newOrder.id,
+                            variation_id: productOrder.variation_id,
                         }
                     })
                 })
