@@ -27,6 +27,18 @@ export class OrderService {
       orderBy: {
         createdAt: 'desc',
       },
+      include: {
+        orderitems: {
+          include: {
+            variation: {
+              include: {
+                product: true,
+              },
+            },
+          },
+        },
+        customer: true,
+      },
     });
 
     return {
