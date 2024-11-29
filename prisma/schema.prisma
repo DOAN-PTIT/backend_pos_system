@@ -136,7 +136,7 @@ model Promotion {
 model Order {
   id            Int     @id @default(autoincrement())
   note          String?
-  status        Boolean
+  status        Int
   delivery_cost_shop Int?
   discount_percent Int?
   paid          Int?
@@ -149,6 +149,7 @@ model Order {
   tracking_number String?
   delivery_cost Int?
   surcharge     Int?
+  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orderitems    OrderItem[]
   customer_id   Int

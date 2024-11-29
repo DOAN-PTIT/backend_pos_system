@@ -624,7 +624,7 @@ export class ShopService {
                     paid, total_cost, recipient_name,
                     recipient_phone_number, note,
                     surcharge, shopuser_id,
-                    status: false,
+                    status: 1,
                     estimated_delivery: new Date(estimated_delivery), 
                     createdAt: new Date(createdAt), 
                     customer_id: newOrderCustomerId,
