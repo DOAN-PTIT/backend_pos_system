@@ -7,14 +7,14 @@ enum Language {
 
 export class UpdateUserDto {
     @IsOptional()
-    name: string;
+    name?: string;
 
     @IsOptional()
     phone_number?: string;
 
     @IsEnum(Language)
     @IsOptional()
-    language: Language;
+    language?: Language;
 
     @IsDateString()
     @IsOptional()

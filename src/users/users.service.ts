@@ -86,7 +86,10 @@ export class UsersService {
                 
                 updateUser['avatar'] = avatarResponse.url
             } 
-            const date_of_birth_update = new Date(updateUser.date_of_birth)
+            let date_of_birth_update
+            if (updateUser.date_of_birth) {
+                date_of_birth_update = new Date(updateUser.date_of_birth)
+            }
 
             return await this.prisma.user.update({
                 where: { id: user_id },
