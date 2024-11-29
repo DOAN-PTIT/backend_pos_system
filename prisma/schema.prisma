@@ -116,6 +116,7 @@ model Variation {
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   product_id    Int 
   product       Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  orderitems    OrderItem[]
 }
 
 model Promotion {
@@ -136,18 +137,18 @@ model Order {
   id            Int     @id @default(autoincrement())
   note          String?
   status        Boolean
-  delivery_cost_shop Int
-  discount_percent Int
-  paid          Int
+  delivery_cost_shop Int?
+  discount_percent Int?
+  paid          Int?
   total_cost    Int
   estimated_delivery DateTime @db.Date
   recipient_name String
   recipient_phone_number String
   delivery_address String
   delivery_company String
-  tracking_number String
-  delivery_cost Int
-  surcharge     Int
+  tracking_number String?
+  delivery_cost Int?
+  surcharge     Int?
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orderitems    OrderItem[]
   customer_id   Int
@@ -165,6 +166,8 @@ model OrderItem {
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   product_id    Int
   product       Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  variation_id  Int
+  variation     Variation @relation(fields: [variation_id], references: [id], onDelete: Cascade)
   order_id      Int
   order         Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
 }

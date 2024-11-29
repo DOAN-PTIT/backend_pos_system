@@ -8,6 +8,9 @@ class ProductOrderDto {
   
     @IsNumber()
     quantity: number;
+
+    @IsNumber()
+    variation_id: number;
   }
 
 export class CreateOrderDto {
@@ -24,20 +27,20 @@ export class CreateOrderDto {
     delivery_address: string;       // địa chỉ nhận hàng
 
     @IsString()
-    @IsNotEmpty()
-    delivery_company: string;       // đơn vị giao hàng
+    @IsOptional()
+    delivery_company: string = "JNT";       // đơn vị giao hàng
 
     @IsNumber()
-    @IsNotEmpty()
-    delivery_cost: number;          // chi phí giao hàng
+    @IsOptional()
+    delivery_cost: number = 0;          // chi phí giao hàng
 
     @IsNumber()
-    @IsNotEmpty()
-    delivery_cost_shop: number;     // tiền giao hàng do shop quyết định
+    @IsOptional()
+    delivery_cost_shop: number = 0;     // tiền giao hàng do shop quyết định
 
     @IsNumber()
-    @IsNotEmpty()
-    discount_percent: number;       // phần trăm giảm giá
+    @IsOptional()
+    discount_percent: number = 0;       // phần trăm giảm giá
 
     @IsDateString()
     @IsOptional()
@@ -45,20 +48,20 @@ export class CreateOrderDto {
     estimated_delivery: string;     // ngày giao hàng dự kiến
 
     @IsString()
-    @IsNotEmpty()
-    tracking_number: string;        // mã vận đơn
+    @IsOptional()
+    tracking_number: string = "";        // mã vận đơn
 
     @IsNumber()
-    @IsNotEmpty()
-    paid: number;                   // đã thanh toán
+    @IsOptional()
+    paid: number = 0;                   // đã thanh toán
 
     @IsNumber()
     @IsNotEmpty()
     total_cost: number;             // tổng phải thanh toán
 
     @IsNumber()
-    @IsNotEmpty()
-    surcharge: number;              // phụ thu
+    @IsOptional()
+    surcharge: number = 0;              // phụ thu
 
     @IsString()
     @IsNotEmpty()
