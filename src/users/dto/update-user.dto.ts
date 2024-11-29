@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsEnum } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsEnum, IsDateString } from "class-validator";
 
 enum Language {
     EN = "en",
@@ -15,4 +15,8 @@ export class UpdateUserDto {
     @IsEnum(Language)
     @IsOptional()
     language: Language;
+
+    @IsDateString()
+    @IsOptional()
+    date_of_birth?: string;
 }

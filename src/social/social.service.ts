@@ -42,7 +42,7 @@ export class SocialService {
         password: '',
         name: `${req.user.firstName} ${req.user.lastName}`,
         phone_number: null,
-        role: 'admin',
+        role: 'user',
         fb_id: req.user.fb_id,
         access_token,
         createdAt: new Date(),
