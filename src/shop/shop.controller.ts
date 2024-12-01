@@ -11,7 +11,8 @@ import {
     UseInterceptors,
     UploadedFile,
     Delete,
-    Query
+    Query,
+    BadRequestException
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/roles/role.guard';
@@ -35,6 +36,7 @@ import { CreateVariationDto } from './dto/create-variation.dto';
 import { OrderService } from 'src/order/order.service';
 import { CustomerService } from 'src/customer/customer.service';
 import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -43,7 +45,8 @@ export class ShopController {
     constructor (
         private shopService: ShopService,
         private orderService: OrderService,
-        private customerService: CustomerService
+        private customerService: CustomerService,
+        private userService: UsersService,
     ) {}
 
     // Shop general
@@ -175,11 +178,50 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(":shopId/employee/:searchKey")
+    async searchEmployee (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string) {
+        return await this.shopService.searchEmployee(shopId, searchKey)
+    }
+
+    @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Post(":shopId/employee/:shopUserId/remove")
     async removeEmployee (@Param('shopUserId') shopUserId: number): Promise<any> {
         
         return await this.shopService.removeEmployee(shopUserId)
+    }
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(Role.User, Role.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/employee/add/find-fb-id')
+    async findByFbId (@Param('shopId') shopId: number, @Body() body: { fb_id: string }) {
+        const { fb_id } = body;
+        const foundUser = await this.userService.findByFbId(fb_id);
+        const isEmployeeExisted = await this.shopService.isEmployeeExisted(foundUser.id, shopId)
+
+        if (isEmployeeExisted) {
+            throw new BadRequestException('Employee already in shop')
+        }
+
+        return foundUser
+    }
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(Role.User, Role.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/employee/add/find-email')
+    async findByEmail (@Param('shopId') shopId: number, @Body() body: { email: string }) {
+        const { email } = body;
+        const foundUser = await this.userService.findByEmail(email);
+        const isEmployeeExisted = await this.shopService.isEmployeeExisted(foundUser.id, shopId)
+
+        if (isEmployeeExisted) {
+            throw new BadRequestException('Employee already in shop')
+        }
+
+        return foundUser
     }
 
     // Customers

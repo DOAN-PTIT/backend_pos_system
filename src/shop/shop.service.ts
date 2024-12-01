@@ -344,22 +344,13 @@ export class ShopService {
         try {
             const data = await Promise.all(
                 addEmployee.map(async employee => {
-                    const foundEmployee = await this.prisma.shopUser.findFirst({ 
-                        where: { 
+                    return this.prisma.shopUser.create({
+                        data: {
                             shop_id: shopId,
-                            user_id: employee.user_id
+                            user_id: employee.user_id,
+                            role: RoleShop.Employee
                         }
                     })
-                    if (!foundEmployee) {
-                        return this.prisma.shopUser.create({
-                            data: {
-                                shop_id: shopId,
-                                user_id: employee.user_id,
-                                role: RoleShop.Employee
-                            }
-                        })
-                    }
-                    return foundEmployee
                 })
             )
 
@@ -368,6 +359,18 @@ export class ShopService {
             console.log(err)
             throw new BadRequestException(err.message)
         }
+    }
+
+    async isEmployeeExisted (user_id: number, shopId: number): Promise<boolean> {
+        const foundEmployee = await this.prisma.shopUser.findFirst({ 
+            where: { 
+                shop_id: shopId,
+                user_id: user_id
+            }
+        }) 
+        if (!foundEmployee) return false
+
+        return true
     }
 
     async removeEmployee(shopUserId: number): Promise<any> {
@@ -414,6 +417,35 @@ export class ShopService {
             return employee
         } catch (error) {
             console.error(error)
+            throw new BadRequestException(error.message)
+        }
+    }
+
+    async searchEmployee (shopId: number, searchKey: string = '') {
+        try {
+            const employees = await this.prisma.shopUser.findMany({
+                where: {
+                    AND: [
+                        { shop_id: shopId },
+                        {
+                            user: {
+                                name: {
+                                    contains: searchKey,
+                                    mode: 'insensitive'
+                                }
+                            }
+                        }
+                    ]
+                },
+                include: { user: true },
+                orderBy: {
+                    user : { name: 'asc' }
+                }
+            });
+
+            return employees
+        } catch (error) {
+            console.log(error)
             throw new BadRequestException(error.message)
         }
     }

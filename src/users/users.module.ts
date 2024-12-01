@@ -21,6 +21,7 @@ import { CustomerModule } from 'src/customer/customer.module';
     AuthService, 
     ShopService,
   ],
-  controllers: [UsersController]
+  controllers: [UsersController],
+  exports: [UsersService]
 })
 export class UsersModule {}
