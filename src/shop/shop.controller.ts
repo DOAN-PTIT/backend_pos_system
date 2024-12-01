@@ -151,10 +151,8 @@ export class ShopController {
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Post(":shopId/employee/add")
-    async addEmployee (@Body() addEmployeeDto: AddEmployeeDto, @Param('shopId') shopId: number): Promise<any> {
-        const { email } = addEmployeeDto
-        
-        return await this.shopService.addEmployee(email, shopId)
+    async addEmployee (@Body() body: AddEmployeeDto[], @Param('shopId') shopId: number): Promise<any> {
+        return await this.shopService.addEmployee(body, shopId)
     }
 
     @Roles(Role.Admin, Role.User)

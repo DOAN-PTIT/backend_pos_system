@@ -1,7 +1,7 @@
-import { IsEmail, IsNotEmpty } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber } from "class-validator";
 
 export class AddEmployeeDto {
-    @IsEmail()
+    @IsNumber()
     @IsNotEmpty()
-    email: string;
+    user_id: number;
 }

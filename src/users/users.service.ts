@@ -32,8 +32,26 @@ export class UsersService {
             console.error(err);
             throw new NotFoundException('User profile not found')
         }
+    }
 
-        return userProfile;
+    async findByEmail (email: string) {
+        const foundUser = await this.prisma.user.findUnique({
+            where: { email }
+        })
+        if (!foundUser) throw new BadRequestException('User not found')
+        
+        const { password, ...user } = foundUser
+        return user
+    }
+
+    async findByFbId (fb_id: string) {
+        const foundUser = await this.prisma.user.findFirst({
+            where: { fb_id }
+        })
+        if (!foundUser) throw new BadRequestException('User not found')
+
+        const { password, ...user } = foundUser
+        return user
     }
 
     async create (createUserDto: CreateUserDto): Promise<any> {

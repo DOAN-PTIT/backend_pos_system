@@ -40,6 +40,22 @@ export class UsersController {
 
     @UseGuards(AuthGuard, RolesGuard)
     @Roles(Role.User, Role.Admin)
+    @Post('find-fb-id')
+    async findByFacebookId (@Body() body: { fb_id: string }) {
+        const { fb_id } = body;
+        return await this.userService.findByFbId(fb_id);
+    }
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(Role.User, Role.Admin)
+    @Post('find-email')
+    async findByEmail (@Body() body: { email: string }) {
+        const { email } = body;
+        return await this.userService.findByEmail(email);
+    }
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(Role.User, Role.Admin)
     @Post('profile-update')
     @UseInterceptors(FileInterceptor('avatar'))
     async updateProfile (

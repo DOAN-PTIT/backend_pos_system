@@ -16,6 +16,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { CustomerService } from 'src/customer/customer.service';
 import { CreateVariationDto } from './dto/create-variation.dto';
 import { Prisma } from '@prisma/client';
+import { AddEmployeeDto } from './dto/add-employee.dto';
 
 @Injectable()
 export class ShopService {
@@ -197,7 +198,9 @@ export class ShopService {
                         },
                     },
                     select: {
-                        id: true, name: true, email: true, phone_number: true, date_of_birth: true, createdAt: true
+                        id: true, name: true, email: true, 
+                        phone_number: true, date_of_birth: true, 
+                        createdAt: true, avatar: true
                     },
                     orderBy: orderBy
                 }),
@@ -337,29 +340,30 @@ export class ShopService {
         }
     }
 
-    async addEmployee (email: string, shopId: number): Promise<any> {
+    async addEmployee (addEmployee: AddEmployeeDto[], shopId: number): Promise<any> {
         try {
-            const foundUser = await this.userRepository.findUserByEmail(email)
-            if (!foundUser) throw new BadRequestException('Employee not found')
-            const userId = foundUser.id
+            const data = await Promise.all(
+                addEmployee.map(async employee => {
+                    const foundEmployee = await this.prisma.shopUser.findFirst({ 
+                        where: { 
+                            shop_id: shopId,
+                            user_id: employee.user_id
+                        }
+                    })
+                    if (!foundEmployee) {
+                        return this.prisma.shopUser.create({
+                            data: {
+                                shop_id: shopId,
+                                user_id: employee.user_id,
+                                role: RoleShop.Employee
+                            }
+                        })
+                    }
+                    return foundEmployee
+                })
+            )
 
-            const foundEmployee = await this.prisma.shopUser.findFirst({ 
-                where: { 
-                    shop_id: shopId,
-                    user_id: userId
-                }
-            })
-            if (foundEmployee) throw new BadRequestException('Employee already in shop')
-
-            const newEmployee = await this.prisma.shopUser.create({
-                data: {
-                    shop_id: shopId,
-                    user_id: userId,
-                    role: RoleShop.Employee
-                }
-            })
-
-            return newEmployee
+            return data
         } catch (err) {
             console.log(err)
             throw new BadRequestException(err.message)
