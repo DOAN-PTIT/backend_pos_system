@@ -186,10 +186,10 @@ export class ShopController {
 
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin)
-    @Post(":shopId/employee/:shopUserId/remove")
-    async removeEmployee (@Param('shopUserId') shopUserId: number): Promise<any> {
+    @Post(":shopId/employee/:userId/remove")
+    async removeEmployee (@Param('shopId') shopId: number, @Param('userId') userId: number) {
         
-        return await this.shopService.removeEmployee(shopUserId)
+        return await this.shopService.removeEmployee(shopId, userId)
     }
 
     @UseGuards(AuthGuard, RolesGuard)

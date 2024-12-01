@@ -384,17 +384,22 @@ export class ShopService {
         return true
     }
 
-    async removeEmployee(shopUserId: number): Promise<any> {
+    async removeEmployee(shopId: number, userId: number) {
         try {
-            const foundShopUser = await this.prisma.shopUser.findUnique({ 
-                where: { id: shopUserId } 
+            const foundShopUser = await this.prisma.shopUser.findFirst({ 
+                where: { 
+                    shop_id: shopId, 
+                    user_id: userId 
+                } 
             })
             if (foundShopUser.role === RoleShop.Owner) {
                 throw new BadRequestException('Cannot remove Shop Owner')
             }
 
             await this.prisma.shopUser.delete({
-                where: { id: shopUserId }
+                where: { 
+                    id: foundShopUser.id
+                }
             })
 
             return { message: 'Remove employee success' }
