@@ -165,7 +165,7 @@ export class ShopService {
     }
 
     async getEmployeesShopById (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
-        const LIMIT = 10
+        const LIMIT = 100
         const skip = (page -1) * LIMIT
         let orderBy = {}
     
@@ -200,7 +200,17 @@ export class ShopService {
                     select: {
                         id: true, name: true, email: true, 
                         phone_number: true, date_of_birth: true, 
-                        createdAt: true, avatar: true
+                        createdAt: true, avatar: true,
+                        shopusers: {
+                            where: { shop_id: shopId },
+                            select: {
+                                id: true,
+                                role: true,
+                                createdAt: true,
+                                user_id: true,
+                                shop_id: true,
+                            },
+                        },
                     },
                     orderBy: orderBy
                 }),
