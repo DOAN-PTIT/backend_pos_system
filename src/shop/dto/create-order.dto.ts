@@ -1,4 +1,4 @@
-import { IsNumber, IsNotEmpty, IsOptional, IsString, ValidateNested, IsDateString, IsArray } from "class-validator";
+import { IsNumber, IsNotEmpty, IsOptional, IsString, ValidateNested, IsDateString, IsArray, IsBoolean } from "class-validator";
 import { Transform, Type } from 'class-transformer';
 import { AddCustomerDto } from "./add-customer.dto";
 
@@ -70,6 +70,10 @@ export class CreateOrderDto {
     @IsString()
     @IsNotEmpty()
     recipient_phone_number: string; // số điện thoại người nhận
+
+	@IsBoolean()
+    @IsNotEmpty()
+    at_counter: boolean; // số điện thoại người nhận
 
     @IsDateString()
     createdAt: string;               // ngày tạo

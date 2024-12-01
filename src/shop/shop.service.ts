@@ -186,6 +186,7 @@ export class ShopService {
 
         try {
             const [employees, totalCount] = await Promise.all([
+                // QUERY NGƯỢC !!!!!!!!!
                 this.prisma.user.findMany({
                     skip,
                     take: LIMIT,
@@ -650,16 +651,17 @@ export class ShopService {
                 note, delivery_address, delivery_company, delivery_cost, delivery_cost_shop,
                 discount_percent, estimated_delivery, tracking_number, paid, total_cost,
                 recipient_name, recipient_phone_number, createdAt, products_order,
-                shopuser_id, add_customer, surcharge
+                shopuser_id, add_customer, surcharge, at_counter
             } = createOrderDto
-            let newOrderCustomerId: number
-
+            
             // check customer existed?
             const foundCustomer = await this.customerService.findByEmailOrPhoneNumberForShop(
                 shopId, add_customer.email, add_customer.phone_number
             )
-
+            
+            let newOrderCustomerId: number
             if (!foundCustomer) {
+                console.log('aaaaa')
                 const newCustomer = await this.addCustomer(add_customer, shopId)
                 newOrderCustomerId = newCustomer.id
             } else {
@@ -676,7 +678,7 @@ export class ShopService {
                     discount_percent, tracking_number, 
                     paid, total_cost, recipient_name,
                     recipient_phone_number, note,
-                    surcharge, shopuser_id,
+                    surcharge, shopuser_id, at_counter,
                     status: 1,
                     estimated_delivery: new Date(estimated_delivery), 
                     createdAt: new Date(createdAt), 

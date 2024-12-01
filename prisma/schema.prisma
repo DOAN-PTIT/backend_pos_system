@@ -149,6 +149,7 @@ model Order {
   tracking_number String?
   delivery_cost Int?
   surcharge     Int?
+  at_counter    Boolean
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orderitems    OrderItem[]
