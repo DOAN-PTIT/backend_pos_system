@@ -232,7 +232,7 @@ export class ShopController {
         @Param('userId') userId: number,
         @Query() query: { role: RoleShop }
     ) {
-        return await this.shopService.removeEmployee(shopId, userId)
+        return await this.shopService.updateShopUserRole(shopId, userId, query.role)
     }
 
     // Customers
