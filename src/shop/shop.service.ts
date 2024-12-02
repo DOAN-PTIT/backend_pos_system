@@ -805,4 +805,23 @@ export class ShopService {
         }
     }
 
+    async updateShopUserRole (shop_id: number, user_id: number, role: RoleShop) {
+        const foundShopUser = await this.prisma.shopUser.findFirst({
+            where: {
+                user_id,
+                shop_id,
+            }
+        })
+        if (!foundShopUser) throw new BadRequestException('ShopUser not found')
+
+        if (foundShopUser.role === RoleShop.Owner) {
+            throw new BadRequestException('Cannot update role of owner')
+        }
+
+        return await this.prisma.shopUser.update({
+            where: { id: foundShopUser.id },
+            data: { role }
+        })
+    }
+
 }

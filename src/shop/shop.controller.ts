@@ -224,6 +224,17 @@ export class ShopController {
         return foundUser
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @Get(":shopId/employee/:userId/role")
+    async updateShopUserRole (
+        @Param('shopId') shopId: number, 
+        @Param('userId') userId: number,
+        @Query() query: { role: RoleShop }
+    ) {
+        return await this.shopService.removeEmployee(shopId, userId)
+    }
+
     // Customers
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin)
