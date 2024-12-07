@@ -119,7 +119,7 @@ export class ShopService {
     }
 
     async getProductsShopById (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
-        const LIMIT = 10
+        const LIMIT = 30
         const skip = (page -1) * LIMIT
         let orderBy = {}
     
@@ -516,7 +516,7 @@ export class ShopService {
 
     async getCustomers (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
         try {
-            const LIMIT = 10
+            const LIMIT = 30
             const skip = (page -1) * LIMIT
             let orderBy = {}
     
