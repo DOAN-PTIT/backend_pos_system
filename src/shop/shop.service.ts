@@ -764,7 +764,7 @@ export class ShopService {
     ): Promise<any> {
         try {
             const { 
-                retail_price, amount, barcode, price_at_counter, variation_code
+                retail_price, amount, barcode, price_at_counter, variation_code, image_url_fb
             } = createVariationDto
 
             const foundProduct = await this.prisma.product.findFirst({
@@ -774,7 +774,7 @@ export class ShopService {
 
             // get avatar url cloud
             let imageUrl:any
-            if (image) {
+            if (image && !image_url_fb) {
                 const avatarResponse = await this.cloudinary.uploadImage(image)
                 .catch(() => {
                     console.log('Invalid file type')
@@ -782,7 +782,13 @@ export class ShopService {
                 })
                 
                 imageUrl = avatarResponse.url
-            } else {
+            } 
+
+            if (!image && image_url_fb) {
+                imageUrl = image_url_fb
+            }
+            
+            if (!imageUrl && !image_url_fb) {
                 imageUrl = this.configService.get<string>('PRODUCT_IMAGE_DEFAULT')
             }
 

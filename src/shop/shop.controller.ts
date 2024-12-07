@@ -289,4 +289,21 @@ export class ShopController {
     async updateOrder (@Param('orderId') orderId: number, @Body() body: UpdateOrderDto) {
         return await this.orderService.updateOrder(orderId, body)
     }
+
+    // OVERVIEW PAGE API
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/order-stat')
+    async orderStat (@Param('shopId') shopId: number) {
+        return await this.orderService.getOrderstat(shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/variation-stat')
+    async variationStat (@Param('shopId') shopId: number) {
+        return await this.orderService.getOrderstat(shopId)
+    }
+
+
 }

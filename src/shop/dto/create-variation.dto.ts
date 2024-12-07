@@ -24,4 +24,8 @@ export class CreateVariationDto {
     @IsString()
     @IsOptional()
     variation_code: string;
+
+    @IsString()
+    @IsOptional()
+    image_url_fb: string;
 }

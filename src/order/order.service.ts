@@ -54,4 +54,47 @@ export class OrderService {
 			data: updateOrder
 		})
 	}
+
+    async getOrderstat (shop_id: number) {
+        const totalAmount  = await this.prisma.order.groupBy({
+            by: ['status'],
+            _sum: {
+                total_cost: true,
+            },
+            where: {
+                shop_id
+            }
+        })
+
+        const totalProductDelivered = await this.prisma.orderItem.aggregate({
+            _sum: {
+                quantity: true,
+            },
+            where: {
+                order: {
+                    status: 4,
+                    shop_id: shop_id
+                }
+            }
+        })
+
+        const totalProductCanceled = await this.prisma.orderItem.aggregate({
+            _sum: {
+                quantity: true,
+            },
+            where: {
+                order: {
+                    status: -1,
+                    shop_id: shop_id
+                }
+            }
+        })
+
+        return {
+            totalAmount,
+            totalProductDelivered,
+            totalProductCanceled
+        }
+    }
+
 }
