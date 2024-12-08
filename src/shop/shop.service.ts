@@ -119,7 +119,7 @@ export class ShopService {
     }
 
     async getProductsShopById (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
-        const LIMIT = 10
+        const LIMIT = 30
         const skip = (page -1) * LIMIT
         let orderBy = {}
     
@@ -516,7 +516,7 @@ export class ShopService {
 
     async getCustomers (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
         try {
-            const LIMIT = 10
+            const LIMIT = 30
             const skip = (page -1) * LIMIT
             let orderBy = {}
     
@@ -658,6 +658,10 @@ export class ShopService {
                 recipient_name, recipient_phone_number, createdAt, products_order,
                 shopuser_id, add_customer, surcharge, at_counter
             } = createOrderDto
+
+            const shopUser = await this.prisma.shopUser.findFirst({
+                where: { user_id: shopuser_id, shop_id: shopId }
+            })
             
             // check customer existed?
             const foundCustomer = await this.customerService.findByEmailOrPhoneNumberForShop(
@@ -666,7 +670,6 @@ export class ShopService {
             
             let newOrderCustomerId: number
             if (!foundCustomer) {
-                console.log('aaaaa')
                 const newCustomer = await this.addCustomer(add_customer, shopId)
                 newOrderCustomerId = newCustomer.id
             } else {
@@ -683,7 +686,9 @@ export class ShopService {
                     discount_percent, tracking_number, 
                     paid, total_cost, recipient_name,
                     recipient_phone_number, note,
-                    surcharge, shopuser_id, at_counter,
+                    surcharge, 
+                    shopuser_id: shopUser.id, 
+                    at_counter,
                     status: 1,
                     estimated_delivery: new Date(estimated_delivery), 
                     createdAt: new Date(createdAt), 
