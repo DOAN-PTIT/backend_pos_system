@@ -290,6 +290,14 @@ export class ShopController {
         return await this.orderService.updateOrder(orderId, body)
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/order/:orderId')
+    async getOrderDetail (@Param('orderId') orderId: number, @Param('shopId') shopId: number) {
+        const params = { id: orderId, shop_id: shopId }
+        return await this.orderService.getOrderDetail(params)
+    }
+
     // OVERVIEW PAGE API
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
