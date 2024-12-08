@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { parse_to_int } from 'src/utils/tools';
 
@@ -61,4 +61,41 @@ export class CustomerService {
       },
     });
   }
+
+  	async getDetailCustomer (customer_id: number, shop_id: number, page: number = 1) {
+		const take = 10
+		const skip = (page - 1) * 10
+
+		const customerInfo = await this.prisma.customer.findUnique({
+			where: { id: customer_id }
+		})
+		if (!customerInfo) {
+			throw new BadRequestException('Customer not found')
+		}
+
+		const [orders, count] = await Promise.all([
+			this.prisma.order.findMany({
+				take,
+				skip,
+				where: {
+					customer_id,
+					shop_id,
+				},
+			}),
+			this.prisma.order.count({
+				where: {
+					customer_id,
+					shop_id,
+				},
+			})
+		])
+
+		return {
+			customer: customerInfo,
+			order: {
+				orders,
+				count
+			}
+		}
+	}
 }

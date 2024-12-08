@@ -37,6 +37,7 @@ import { OrderService } from 'src/order/order.service';
 import { CustomerService } from 'src/customer/customer.service';
 import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
 import { UsersService } from 'src/users/users.service';
+import { ProductService } from 'src/product/product.service';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -47,6 +48,7 @@ export class ShopController {
         private orderService: OrderService,
         private customerService: CustomerService,
         private userService: UsersService,
+        private productService: ProductService
     ) {}
 
     // Shop general
@@ -127,6 +129,16 @@ export class ShopController {
     @Get(':shopId/products/:searchKey')
     async searchProducts (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
         return await this.shopService.searchProducts(shopId, searchKey);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/product/:productId/delete')
+    async deleteProduct (
+        @Param('shopId') shopId: number, 
+        @Param('productId') productId: number
+    ) {
+        return await this.productService.removeProduct(productId);
     }
 
     // Variations
@@ -237,7 +249,7 @@ export class ShopController {
 
     // Customers
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post(":shopId/customer/add")
     async addCustomer (@Body() addCustomerDto: AddCustomerDto, @Param('shopId') shopId: number): Promise<any> {
         
@@ -265,6 +277,16 @@ export class ShopController {
     @Post(':shopId/customers')
     async searchCustomer(@Req() req: Request): Promise<any> {
         return await this.customerService.searchCustomer(req.query as any);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/customer/:customerId/detail')
+    async getCustomerDetail (
+        @Param('shopId') shopId: number,
+        @Param('customerId') customerId: number,
+    ): Promise<any> {
+        return await this.customerService.getDetailCustomer(customerId, shopId);
     }
 
     // Orders
