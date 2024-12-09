@@ -64,18 +64,18 @@ model ShopSetting {
   source_order  String?
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  shop_id       Int @unique
-  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  shop_id       Int? @unique
+  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
 
 model ShopUser {
   id            Int     @id @default(autoincrement())
   role          String @default("admin")
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  user_id       Int
-  shop_id       Int
-  user          User @relation(fields: [user_id], references: [id], onDelete: SetNull)
-  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  user_id       Int?
+  shop_id       Int?
+  user          User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   orders         Order[]
 }
 
@@ -90,8 +90,8 @@ model Product {
   variations    Variation[]
   promotionitems PromotionItem[]
   orderitems    OrderItem[]
-  shop_id       Int
-  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  shop_id       Int?
+  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   categories_id Int?
   categories    Categories? @relation(fields: [categories_id], references: [id], onDelete: SetNull)
 }
@@ -115,8 +115,8 @@ model Variation {
   price_at_counter  Int
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  product_id    Int 
-  product       Product @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  product_id    Int?
+  product       Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
   orderitems    OrderItem[]
 }
 
@@ -130,8 +130,8 @@ model Promotion {
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   promotionitems PromotionItem[]
-  shop_id       Int
-  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  shop_id       Int?
+  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
 
 model Order {
@@ -154,12 +154,12 @@ model Order {
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orderitems    OrderItem[]
-  customer_id   Int
-  customer      Customer @relation(fields: [customer_id], references: [id], onDelete: SetNull)
-  shopuser_id   Int
-  shopuser      ShopUser @relation(fields: [shopuser_id], references: [id], onDelete: SetNull)
-  shop_id       Int
-  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  customer_id   Int?
+  customer      Customer? @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+  shopuser_id   Int?
+  shopuser      ShopUser? @relation(fields: [shopuser_id], references: [id], onDelete: SetNull)
+  shop_id       Int?
+  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
 
 model OrderItem {
@@ -167,12 +167,12 @@ model OrderItem {
   quantity      Int
   note          String?
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  product_id    Int
-  product       Product @relation(fields: [product_id], references: [id], onDelete: SetNull)
-  variation_id  Int
-  variation     Variation @relation(fields: [variation_id], references: [id], onDelete: SetNull)
-  order_id      Int
-  order         Order @relation(fields: [order_id], references: [id], onDelete: SetNull)
+  product_id    Int?
+  product       Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  variation_id  Int?
+  variation     Variation? @relation(fields: [variation_id], references: [id], onDelete: SetNull)
+  order_id      Int?
+  order         Order? @relation(fields: [order_id], references: [id], onDelete: SetNull)
 }
 
 model Customer {
@@ -196,17 +196,17 @@ model ShopCustomer {
   id            Int     @id @default(autoincrement())
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  shop_id       Int
-  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
-  customer_id   Int
-  customer      Customer @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+  shop_id       Int?
+  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  customer_id   Int?
+  customer      Customer? @relation(fields: [customer_id], references: [id], onDelete: SetNull)
 }
 
 model PromotionItem {
   id            Int     @id @default(autoincrement())
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  product_id    Int
-  product       Product @relation(fields: [product_id], references: [id], onDelete: SetNull)
-  promotion_id  Int
-  promotion     Promotion @relation(fields: [promotion_id], references: [id], onDelete: SetNull)
+  product_id    Int?
+  product       Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  promotion_id  Int?
+  promotion     Promotion? @relation(fields: [promotion_id], references: [id], onDelete: SetNull)
 }
