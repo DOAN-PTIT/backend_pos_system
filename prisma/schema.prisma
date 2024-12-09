@@ -65,7 +65,7 @@ model ShopSetting {
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   shop_id       Int @unique
-  shop          Shop @relation(fields: [shop_id], references: [id])
+  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
 
 model ShopUser {
@@ -74,8 +74,8 @@ model ShopUser {
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   user_id       Int
   shop_id       Int
-  user          User @relation(fields: [user_id], references: [id])
-  shop          Shop @relation(fields: [shop_id], references: [id])
+  user          User @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   orders         Order[]
 }
 
@@ -91,9 +91,9 @@ model Product {
   promotionitems PromotionItem[]
   orderitems    OrderItem[]
   shop_id       Int
-  shop          Shop @relation(fields: [shop_id], references: [id])
+  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   categories_id Int?
-  categories    Categories? @relation(fields: [categories_id], references: [id])
+  categories    Categories? @relation(fields: [categories_id], references: [id], onDelete: SetNull)
 }
 
 model Categories {
@@ -116,7 +116,7 @@ model Variation {
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   product_id    Int 
-  product       Product @relation(fields: [product_id], references: [id])
+  product       Product @relation(fields: [product_id], references: [id], onDelete: SetNull)
   orderitems    OrderItem[]
 }
 
@@ -131,7 +131,7 @@ model Promotion {
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   promotionitems PromotionItem[]
   shop_id       Int
-  shop          Shop @relation(fields: [shop_id], references: [id])
+  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
 
 model Order {
@@ -155,11 +155,11 @@ model Order {
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   orderitems    OrderItem[]
   customer_id   Int
-  customer      Customer @relation(fields: [customer_id], references: [id])
+  customer      Customer @relation(fields: [customer_id], references: [id], onDelete: SetNull)
   shopuser_id   Int
-  shopuser      ShopUser @relation(fields: [shopuser_id], references: [id])
+  shopuser      ShopUser @relation(fields: [shopuser_id], references: [id], onDelete: SetNull)
   shop_id       Int
-  shop          Shop @relation(fields: [shop_id], references: [id])
+  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
 
 model OrderItem {
@@ -168,11 +168,11 @@ model OrderItem {
   note          String?
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   product_id    Int
-  product       Product @relation(fields: [product_id], references: [id])
+  product       Product @relation(fields: [product_id], references: [id], onDelete: SetNull)
   variation_id  Int
-  variation     Variation @relation(fields: [variation_id], references: [id])
+  variation     Variation @relation(fields: [variation_id], references: [id], onDelete: SetNull)
   order_id      Int
-  order         Order @relation(fields: [order_id], references: [id])
+  order         Order @relation(fields: [order_id], references: [id], onDelete: SetNull)
 }
 
 model Customer {
@@ -197,16 +197,16 @@ model ShopCustomer {
   updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   shop_id       Int
-  shop          Shop @relation(fields: [shop_id], references: [id])
+  shop          Shop @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   customer_id   Int
-  customer      Customer @relation(fields: [customer_id], references: [id])
+  customer      Customer @relation(fields: [customer_id], references: [id], onDelete: SetNull)
 }
 
 model PromotionItem {
   id            Int     @id @default(autoincrement())
   createdAt     DateTime @default(now()) @db.Timestamptz(6)
   product_id    Int
-  product       Product @relation(fields: [product_id], references: [id])
+  product       Product @relation(fields: [product_id], references: [id], onDelete: SetNull)
   promotion_id  Int
-  promotion     Promotion @relation(fields: [promotion_id], references: [id])
+  promotion     Promotion @relation(fields: [promotion_id], references: [id], onDelete: SetNull)
 }

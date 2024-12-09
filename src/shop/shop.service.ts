@@ -38,9 +38,27 @@ export class ShopService {
     }
 
     async getListShop(userId: number) {
-        let listShop = []
-        listShop = await this.shopRepository.findShopByUserId(userId)
-        return listShop
+        let listShop = await this.shopRepository.findShopByUserId(userId)
+
+        const listShopIds = listShop.map(shop => shop.id)
+
+        const listShopWithRole = await Promise.all(
+            listShop.map(async (shop) => {
+                const shopUser = await this.prisma.shopUser.findFirst({
+                    where: {
+                        shop_id: shop.id,
+                        user_id: userId
+                    }
+                })
+
+                return {
+                    ...shop,
+                    user_role: shopUser.role || null
+                }
+            })
+        )
+
+        return listShopWithRole
     }
 
     async createShop (createShopDto: CreateShopDto, userId: number, avatar?: Express.Multer.File) {
