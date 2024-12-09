@@ -48,6 +48,33 @@ export class OrderService {
     };
   }
 
+  async getOrderDetail(params: { id: number; shop_id: number }) {
+    const { id, shop_id } = parse_to_int(params);
+    return await this.prisma.order.findUnique({
+      where: {
+        id,
+        shop_id,
+      },
+      include: {
+        orderitems: {
+          include: {
+            variation: {
+              include: {
+                product: true,
+              },
+            },
+          },
+        },
+        shopuser: {
+          include: {
+            user: true,
+          },
+        },
+        customer: true,
+      },
+    });
+  }
+
 	async updateOrder (id: number, updateOrder: UpdateOrderDto) {
 		return await this.prisma.order.update({
 			where: { id },
