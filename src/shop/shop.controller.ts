@@ -37,6 +37,7 @@ import { OrderService } from 'src/order/order.service';
 import { CustomerService } from 'src/customer/customer.service';
 import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
 import { UsersService } from 'src/users/users.service';
+import { ProductService } from 'src/product/product.service';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -47,6 +48,7 @@ export class ShopController {
         private orderService: OrderService,
         private customerService: CustomerService,
         private userService: UsersService,
+        private productService: ProductService
     ) {}
 
     // Shop general
@@ -127,6 +129,13 @@ export class ShopController {
     @Get(':shopId/products/:searchKey')
     async searchProducts (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
         return await this.shopService.searchProducts(shopId, searchKey);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/product/:productId')
+    async getProduct(@Param('shopId') shopId: number, @Param('productId') productId: string): Promise<any> {
+        return await this.productService.getProduct(productId, shopId)
     }
 
     // Variations
