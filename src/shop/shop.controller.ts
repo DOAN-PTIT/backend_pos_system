@@ -133,6 +133,13 @@ export class ShopController {
 
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/product/:productId')
+    async getProduct(@Param('shopId') shopId: number, @Param('productId') productId: string): Promise<any> {
+        return await this.productService.getProduct(productId, shopId)
+    }
+  
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Get(':shopId/product/:productId/delete')
     async deleteProduct (
         @Param('shopId') shopId: number, 
