@@ -10,6 +10,7 @@ import { ShopModule } from './shop/shop.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CustomerModule } from './customer/customer.module';
 import { OrderModule } from './order/order.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { OrderModule } from './order/order.module';
     ShopModule,
     CloudinaryModule,
     CustomerModule,
-    OrderModule
+    OrderModule,
+    ProductModule
   ],
   controllers: [AppController],
   providers: [AppService],

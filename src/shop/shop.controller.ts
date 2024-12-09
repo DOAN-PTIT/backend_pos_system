@@ -137,6 +137,16 @@ export class ShopController {
     async getProduct(@Param('shopId') shopId: number, @Param('productId') productId: string): Promise<any> {
         return await this.productService.getProduct(productId, shopId)
     }
+  
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/product/:productId/delete')
+    async deleteProduct (
+        @Param('shopId') shopId: number, 
+        @Param('productId') productId: number
+    ) {
+        return await this.productService.removeProduct(productId);
+    }
 
     // Variations
     @Roles(Role.Admin, Role.User)
@@ -246,7 +256,7 @@ export class ShopController {
 
     // Customers
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post(":shopId/customer/add")
     async addCustomer (@Body() addCustomerDto: AddCustomerDto, @Param('shopId') shopId: number): Promise<any> {
         
@@ -274,6 +284,16 @@ export class ShopController {
     @Post(':shopId/customers')
     async searchCustomer(@Req() req: Request): Promise<any> {
         return await this.customerService.searchCustomer(req.query as any);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/customer/:customerId/detail')
+    async getCustomerDetail (
+        @Param('shopId') shopId: number,
+        @Param('customerId') customerId: number,
+    ): Promise<any> {
+        return await this.customerService.getDetailCustomer(customerId, shopId);
     }
 
     // Orders

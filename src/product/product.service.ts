@@ -16,4 +16,11 @@ export class ProductService {
       },
     });
   }
+
+    async removeProduct (id: number) {
+        return this.prisma.product.delete({
+            where: { id },
+        })
+    }
+
 }
