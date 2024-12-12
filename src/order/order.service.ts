@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { parse_to_int } from 'src/utils/tools';
-import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -75,53 +74,87 @@ export class OrderService {
     });
   }
 
-	async updateOrder (id: number, updateOrder: UpdateOrderDto) {
-		return await this.prisma.order.update({
-			where: { id },
-			data: updateOrder
-		})
-	}
+  async updateOrder(id: number, shop_id: number, updateOrder: any) {
+    delete updateOrder.id;
+    const { orderitems, shopuser, customer, add_customer, ...newOrder } =
+      updateOrder;
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id,
+        shop_id,
+      },
+    });
+    const orderUpdate = await this.prisma.order.update({
+      where: {
+        id,
+        shop_id,
+      },
+      data: {
+        ...newOrder,
+        customer_id: add_customer ? add_customer?.id : order.customer_id,
+      },
+    });
 
-    async getOrderstat (shop_id: number) {
-        const totalAmount  = await this.prisma.order.groupBy({
-            by: ['status'],
-            _sum: {
-                total_cost: true,
-            },
-            where: {
-                shop_id
-            }
-        })
+    await this.prisma.orderItem.deleteMany({
+      where: {
+        order_id: id,
+      },
+    });
+    await Promise.all(
+      orderitems.map((productOrder) => {
+        return this.prisma.orderItem.create({
+          data: {
+            product_id: productOrder.product_id,
+            variation_id: productOrder.variation_id,
+            order_id: id,
+            quantity: productOrder.quantity,
+          },
+        });
+      }),
+    );
 
-        const totalProductDelivered = await this.prisma.orderItem.aggregate({
-            _sum: {
-                quantity: true,
-            },
-            where: {
-                order: {
-                    status: 4,
-                    shop_id: shop_id
-                }
-            }
-        })
+    return orderUpdate;
+  }
 
-        const totalProductCanceled = await this.prisma.orderItem.aggregate({
-            _sum: {
-                quantity: true,
-            },
-            where: {
-                order: {
-                    status: -1,
-                    shop_id: shop_id
-                }
-            }
-        })
+  async getOrderstat(shop_id: number) {
+    const totalAmount = await this.prisma.order.groupBy({
+      by: ['status'],
+      _sum: {
+        total_cost: true,
+      },
+      where: {
+        shop_id,
+      },
+    });
 
-        return {
-            totalAmount,
-            totalProductDelivered,
-            totalProductCanceled
-        }
-    }
+    const totalProductDelivered = await this.prisma.orderItem.aggregate({
+      _sum: {
+        quantity: true,
+      },
+      where: {
+        order: {
+          status: 4,
+          shop_id: shop_id,
+        },
+      },
+    });
 
+    const totalProductCanceled = await this.prisma.orderItem.aggregate({
+      _sum: {
+        quantity: true,
+      },
+      where: {
+        order: {
+          status: -1,
+          shop_id: shop_id,
+        },
+      },
+    });
+
+    return {
+      totalAmount,
+      totalProductDelivered,
+      totalProductCanceled,
+    };
+  }
 }
