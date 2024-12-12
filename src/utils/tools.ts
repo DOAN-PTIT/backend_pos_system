@@ -1,4 +1,5 @@
 export const parse_to_int = (value: any): any => {
+  if (value == '') return '';
   if (typeof value === 'object' && value !== null) {
     const parsedObject = {};
     for (const key in value) {

@@ -148,6 +148,17 @@ export class ShopController {
         return await this.productService.removeProduct(productId);
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/product/:productId/update')
+    async updateProduct (
+        @Param('shopId') shopId: number, 
+        @Param('productId') productId: number,
+        @Body() updateProductDto: any
+    ) {
+        return await this.productService.updateProduct(productId, shopId, updateProductDto)
+    }
+
     // Variations
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
