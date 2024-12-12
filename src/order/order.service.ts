@@ -151,10 +151,31 @@ export class OrderService {
       },
     });
 
+    const totalOrder = await this.prisma.order.count({
+      where: {
+        shop_id,
+      },
+    });
+
+    // count retail_price and amount of variation
+    const totalVariation = await this.prisma.variation.aggregate({
+      where: {
+        product: {
+          shop_id,
+        },
+      },
+      _sum: {
+        retail_price: true,
+        amount: true,
+      },
+    });
+
     return {
       totalAmount,
       totalProductDelivered,
       totalProductCanceled,
+      totalOrder,
+      totalVariation,
     };
   }
 }
