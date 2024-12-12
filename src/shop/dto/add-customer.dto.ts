@@ -36,4 +36,7 @@ export class AddCustomerDto {
     @IsOptional()
     @Transform(({ value }) => value ?? null)
     last_purchase?: string;
+
+    @IsOptional()
+    id?: any
 }

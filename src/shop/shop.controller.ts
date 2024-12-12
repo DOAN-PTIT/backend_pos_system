@@ -315,8 +315,8 @@ export class ShopController {
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post(':shopId/order/:orderId')
-    async updateOrder (@Param('orderId') orderId: number, @Body() body: UpdateOrderDto) {
-        return await this.orderService.updateOrder(orderId, body)
+    async updateOrder (@Param("shopId") shop_id: number, @Param('orderId') orderId: number, @Body() body: any) {
+        return await this.orderService.updateOrder(orderId, shop_id, body)
     }
 
     @Roles(Role.Admin, Role.User)
