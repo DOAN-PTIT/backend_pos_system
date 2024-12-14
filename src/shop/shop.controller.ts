@@ -38,6 +38,7 @@ import { CustomerService } from 'src/customer/customer.service';
 import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
 import { UsersService } from 'src/users/users.service';
 import { ProductService } from 'src/product/product.service';
+import { PromotionService } from 'src/promotion/promotion.service';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -48,7 +49,8 @@ export class ShopController {
         private orderService: OrderService,
         private customerService: CustomerService,
         private userService: UsersService,
-        private productService: ProductService
+        private productService: ProductService,
+        protected promotionService: PromotionService
     ) {}
 
     // Shop general
@@ -351,6 +353,28 @@ export class ShopController {
     @Post(':shopId/variation-stat')
     async variationStat (@Param('shopId') shopId: number) {
         return await this.orderService.getOrderstat(shopId)
+    }
+
+    // Promotion
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/promotions')
+    async getPromotions (@Param('shopId') shopId: number, @Query() params: any) {
+        return await this.promotionService.getListPromotion({ ...params, shop_id: shopId })
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/promotion/:promotionId')
+    async getPromotionDetail (@Param('shopId') shopId: number, @Param('promotionId') promotionId: number) {
+        return await this.promotionService.getPromotionDetail({ id: promotionId, shop_id: shopId })
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @Post(':shopId/promotion/create')
+    async createPromotion (@Param('shopId') shopId: number, @Body() params: any) {
+        return await this.promotionService.createPromotion({ ...params, shop_id: shopId })
     }
 
 
