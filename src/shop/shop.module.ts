@@ -10,13 +10,14 @@ import { CustomerModule } from 'src/customer/customer.module';
 import { OrderModule } from 'src/order/order.module';
 import { UsersModule } from 'src/users/users.module';
 import { ProductModule } from 'src/product/product.module';
+import { PromotionService } from 'src/promotion/promotion.service';
 
 @Module({
   imports: [
     CloudinaryModule, AuthModule, CustomerModule, OrderModule, ProductModule,
     forwardRef(() => UsersModule)
   ],
-  providers: [ShopService, PrismaService, ShopRepository, UserRepository],
+  providers: [ShopService, PrismaService, ShopRepository, UserRepository, PromotionService],
   controllers: [ShopController],
   exports: [ShopRepository]
 })

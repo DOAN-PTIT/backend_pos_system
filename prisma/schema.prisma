@@ -20,8 +20,8 @@ enum Gender {
 }
 
 model User {
-  id            Int     @id @default(autoincrement())
-  email         String  @unique
+  id            Int        @id @default(autoincrement())
+  email         String     @unique
   name          String
   password      String
   avatar        String?
@@ -30,22 +30,22 @@ model User {
   fb_id         String?
   access_token  String?
   date_of_birth DateTime?
-  role          String @default("user")
-  updatedAt     DateTime? @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime? @default(now()) @db.Timestamptz(6)
+  role          String     @default("user")
+  updatedAt     DateTime?  @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt     DateTime?  @default(now()) @db.Timestamptz(6)
   shopusers     ShopUser[]
 }
 
 model Shop {
-  id            Int     @id @default(autoincrement())
+  id            Int            @id @default(autoincrement())
   name          String
   avatar        String
-  currency      String @default("VND")
+  currency      String         @default("VND")
   description   String?
   fb_shop_id    String?
-  is_deleted    Boolean @default(false)
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+  is_deleted    Boolean        @default(false)
+  updatedAt     DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt     DateTime       @default(now()) @db.Timestamptz(6)
   shopusers     ShopUser[]
   promotions    Promotion[]
   products      Product[]
@@ -55,158 +55,163 @@ model Shop {
 }
 
 model ShopSetting {
-  id            Int     @id @default(autoincrement())
-  date_format   String
-  location      String
-  language      String
-  time_zone     String  @default("Asia/Ho_Chi_Minh")
-  auto_product_code Boolean @default(false)
-  source_order  String?
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  shop_id       Int? @unique
-  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  id                Int      @id @default(autoincrement())
+  date_format       String
+  location          String
+  language          String
+  time_zone         String   @default("Asia/Ho_Chi_Minh")
+  auto_product_code Boolean  @default(false)
+  source_order      String?
+  updatedAt         DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  shop_id           Int?     @unique
+  shop              Shop?    @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
 
 model ShopUser {
-  id            Int     @id @default(autoincrement())
-  role          String @default("admin")
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  user_id       Int?
-  shop_id       Int?
-  user          User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
-  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
-  orders         Order[]
+  id        Int      @id @default(autoincrement())
+  role      String   @default("admin")
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  user_id   Int?
+  shop_id   Int?
+  user      User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  shop      Shop?    @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  orders    Order[]
 }
 
 model Product {
-  id            Int     @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   name          String
   description   String?
   note          String?
-  product_code  String @unique
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now())@db.Timestamptz(6)
+  product_code  String      @unique
+  updatedAt     DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt     DateTime    @default(now()) @db.Timestamptz(6)
   variations    Variation[]
-  promotionitems PromotionItem[]
   orderitems    OrderItem[]
   shop_id       Int?
-  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  shop          Shop?       @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   categories_id Int?
   categories    Categories? @relation(fields: [categories_id], references: [id], onDelete: SetNull)
 }
 
 model Categories {
-  id            Int     @id @default(autoincrement())
-  name          String
-  description   String
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now())@db.Timestamptz(6)
-  products      Product[]
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  products    Product[]
 }
 
 model Variation {
-  id            Int     @id @default(autoincrement())
-  retail_price  Int
-  image         String
-  amount        Int
-  barcode       String  @unique
-  variation_code  String  @unique
-  price_at_counter  Int
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  product_id    Int?
-  product       Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
-  orderitems    OrderItem[]
+  id               Int            @id @default(autoincrement())
+  retail_price     Int
+  image            String
+  amount           Int
+  barcode          String         @unique
+  variation_code   String         @unique
+  price_at_counter Int
+  updatedAt        DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
+  product_id       Int?
+  product          Product?       @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  orderitems       OrderItem[]
+  promotion_item   PromotionItem?
 }
 
 model Promotion {
-  id            Int     @id @default(autoincrement())
-  value         Int
-  name          Int
-  start_date    DateTime
-  due_date      DateTime
-  is_discount_percent Int
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  promotionitems PromotionItem[]
-  shop_id       Int?
-  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  id              Int             @id @default(autoincrement())
+  name            String
+  start_date      DateTime
+  due_date        DateTime
+  condition       Json?
+  order_range     Json?
+  status          Int             @default(1)
+  type            Int             @default(1)
+  updatedAt       DateTime        @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt       DateTime        @default(now()) @db.Timestamptz(6)
+  promotion_items PromotionItem[]
+  shop_id         Int?
+  shop            Shop?           @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
 
 model Order {
-  id            Int     @id @default(autoincrement())
-  note          String?
-  status        Int
-  delivery_cost_shop Int?
-  discount_percent Int?
-  paid          Int?
-  total_cost    Int
-  estimated_delivery DateTime @db.Date
-  recipient_name String
+  id                     Int         @id @default(autoincrement())
+  note                   String?
+  status                 Int
+  delivery_cost_shop     Int?
+  discount_percent       Int?
+  paid                   Int?
+  total_cost             Int
+  estimated_delivery     DateTime    @db.Date
+  recipient_name         String
   recipient_phone_number String
-  delivery_address String
-  delivery_company String
-  tracking_number String?
-  delivery_cost Int?
-  surcharge     Int?
-  at_counter    Boolean
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  orderitems    OrderItem[]
-  customer_id   Int?
-  customer      Customer? @relation(fields: [customer_id], references: [id], onDelete: SetNull)
-  shopuser_id   Int?
-  shopuser      ShopUser? @relation(fields: [shopuser_id], references: [id], onDelete: SetNull)
-  shop_id       Int?
-  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  delivery_address       String
+  delivery_company       String
+  tracking_number        String?
+  delivery_cost          Int?
+  surcharge              Int?
+  at_counter             Boolean
+  updatedAt              DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt              DateTime    @default(now()) @db.Timestamptz(6)
+  orderitems             OrderItem[]
+  customer_id            Int?
+  customer               Customer?   @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+  shopuser_id            Int?
+  shopuser               ShopUser?   @relation(fields: [shopuser_id], references: [id], onDelete: SetNull)
+  shop_id                Int?
+  shop                   Shop?       @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
 
 model OrderItem {
-  id            Int     @id @default(autoincrement())
-  quantity      Int
-  note          String?
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  product_id    Int?
-  product       Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
-  variation_id  Int?
-  variation     Variation? @relation(fields: [variation_id], references: [id], onDelete: SetNull)
-  order_id      Int?
-  order         Order? @relation(fields: [order_id], references: [id], onDelete: SetNull)
+  id           Int        @id @default(autoincrement())
+  quantity     Int
+  note         String?
+  createdAt    DateTime   @default(now()) @db.Timestamptz(6)
+  product_id   Int?
+  product      Product?   @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  variation_id Int?
+  variation    Variation? @relation(fields: [variation_id], references: [id], onDelete: SetNull)
+  order_id     Int?
+  order        Order?     @relation(fields: [order_id], references: [id], onDelete: SetNull)
 }
 
 model Customer {
-  id            Int     @id @default(autoincrement())
-  name          String
-  email         String  @unique
-  gender        Gender
-  address       String?
-  phone_number  String
-  referral_code  String?
-  number_of_referrals Int  @default(0)
-  date_of_birth DateTime? @db.Date
-  last_purchase DateTime? @db.Date
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  orders        Order[]
-  shopcustomers ShopCustomer[]
+  id                  Int            @id @default(autoincrement())
+  name                String
+  email               String         @unique
+  gender              Gender
+  address             String?
+  phone_number        String
+  referral_code       String?
+  number_of_referrals Int            @default(0)
+  date_of_birth       DateTime?      @db.Date
+  last_purchase       DateTime?      @db.Date
+  updatedAt           DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt           DateTime       @default(now()) @db.Timestamptz(6)
+  orders              Order[]
+  shopcustomers       ShopCustomer[]
 }
 
 model ShopCustomer {
-  id            Int     @id @default(autoincrement())
-  updatedAt     DateTime @updatedAt @default(now()) @db.Timestamptz(6)
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  shop_id       Int?
-  shop          Shop? @relation(fields: [shop_id], references: [id], onDelete: SetNull)
-  customer_id   Int?
-  customer      Customer? @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+  id          Int       @id @default(autoincrement())
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  shop_id     Int?
+  shop        Shop?     @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  customer_id Int?
+  customer    Customer? @relation(fields: [customer_id], references: [id], onDelete: SetNull)
 }
 
 model PromotionItem {
-  id            Int     @id @default(autoincrement())
-  createdAt     DateTime @default(now()) @db.Timestamptz(6)
-  product_id    Int?
-  product       Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
-  promotion_id  Int?
-  promotion     Promotion? @relation(fields: [promotion_id], references: [id], onDelete: SetNull)
+  id                  Int        @id @default(autoincrement())
+  createdAt           DateTime   @default(now()) @db.Timestamptz(6)
+  variation_id        Int?       @unique
+  variation           Variation? @relation(fields: [variation_id], references: [id], onDelete: SetNull)
+  promotion_id        Int?
+  promotion           Promotion? @relation(fields: [promotion_id], references: [id], onDelete: SetNull)
+  is_discount_percent Boolean
+  discount            Int
+  max_discount        Int
 }
