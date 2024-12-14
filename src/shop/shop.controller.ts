@@ -350,9 +350,9 @@ export class ShopController {
 
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
-    @Post(':shopId/variation-stat')
-    async variationStat (@Param('shopId') shopId: number) {
-        return await this.orderService.getOrderstat(shopId)
+    @Get(':shopId/day-chart')
+    async dayChart (@Param('shopId') shopId: number) {
+        return await this.orderService.getDayChart(shopId)
     }
 
     // Promotion
@@ -376,6 +376,5 @@ export class ShopController {
     async createPromotion (@Param('shopId') shopId: number, @Body() params: any) {
         return await this.promotionService.createPromotion({ ...params, shop_id: shopId })
     }
-
 
 }
