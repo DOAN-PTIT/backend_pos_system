@@ -4,75 +4,89 @@ import { parse_to_int } from 'src/utils/tools';
 
 @Injectable()
 export class OrderService {
-    constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
-    async getListOrder(params: {
-        page: number;
-        page_size: number;
-        shop_id: number;
-    }) {
-        const { page, page_size, shop_id } = parse_to_int(params);
-        const skip = (page - 1) * page_size;
-        const total = await this.prisma.order.count({
-        where: {
-            shop_id,
-        },
-        });
-        const data = await this.prisma.order.findMany({
-        where: {
-            shop_id,
-        },
-        skip,
-        take: page_size,
-        orderBy: {
-            createdAt: 'desc',
-        },
-        include: {
-            orderitems: {
-            include: {
-                variation: {
-                include: {
-                    product: true,
-                },
-                },
+  async getListOrder(params: {
+    page: number;
+    page_size: number;
+    shop_id: number;
+  }) {
+    const { page, page_size, shop_id } = parse_to_int(params);
+    const skip = (page - 1) * page_size;
+    const total = await this.prisma.order.count({
+      where: {
+        shop_id,
+      },
+    });
+    const data = await this.prisma.order.findMany({
+      where: {
+        shop_id,
+      },
+      skip,
+      take: page_size,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        promotion: true,
+        orderitems: {
+          include: {
+            variation: {
+              include: {
+                product: true,
+              },
             },
-            },
-            customer: true,
+          },
         },
-        });
+        customer: true,
+      },
+    });
 
-        return {
-        totalEntries: total,
-        data,
-        };
+    return {
+      totalEntries: total,
+      data,
+    };
+  }
+
+  async getOrderDetail(params: { id: number; shop_id: number }) {
+    const { id, shop_id } = parse_to_int(params);
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id,
+        shop_id,
+      },
+      include: {
+        orderitems: {
+          include: {
+            variation: {
+              include: {
+                product: true,
+                promotion_item: true,
+              },
+            },
+          },
+        },
+        promotion: true,
+        shopuser: {
+          include: {
+            user: true,
+          },
+        },
+        customer: true,
+      },
+    });
+
+    // parse promotion
+    if (order.promotion) {
+      order.promotion = {
+        ...order.promotion,
+        condition: JSON.parse(order.promotion.condition as string),
+        order_range: JSON.parse(order.promotion.order_range as string),
+      };
     }
 
-    async getOrderDetail(params: { id: number; shop_id: number }) {
-        const { id, shop_id } = parse_to_int(params);
-        return await this.prisma.order.findUnique({
-        where: {
-            id,
-            shop_id,
-        },
-        include: {
-            orderitems: {
-            include: {
-                variation: {
-                include: {
-                    product: true,
-                },
-                },
-            },
-            },
-            shopuser: {
-            include: {
-                user: true,
-            },
-            },
-            customer: true,
-        },
-        });
-    }
+    return order;
+  }
 
     async updateOrder(id: number, shop_id: number, updateOrder: any) {
         delete updateOrder.id;

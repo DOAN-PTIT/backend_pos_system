@@ -38,10 +38,6 @@ export class CreateOrderDto {
     @IsOptional()
     delivery_cost_shop: number = 0;     // tiền giao hàng do shop quyết định
 
-    @IsNumber()
-    @IsOptional()
-    discount_percent: number = 0;       // phần trăm giảm giá
-
     @IsDateString()
     @IsOptional()
     // @Type(() => Date)
@@ -87,4 +83,10 @@ export class CreateOrderDto {
     @IsNumber()
     @IsNotEmpty()
     shopuser_id: number             // id nhân viên 
+
+    @IsOptional()
+    promotion: any
+
+    @IsNumber()
+    total_discount: number = 0
 }

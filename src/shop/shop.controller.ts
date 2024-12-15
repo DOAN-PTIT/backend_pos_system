@@ -377,4 +377,10 @@ export class ShopController {
         return await this.promotionService.createPromotion({ ...params, shop_id: shopId })
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/promotions/promotion-can-be-active')
+    async findPromotionCanBeActive (@Param('shopId') shopId: number, @Query() params: any) {
+        return await this.promotionService.findPromotionCanBeActive({ ...params, shop_id: shopId })
+    }
 }
