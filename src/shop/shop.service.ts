@@ -656,7 +656,8 @@ export class ShopService {
                 },
                 include: {
                     // shop: true,
-                    product: true
+                    product: true,
+                    promotion_item: true
                 },
                 orderBy: {
                     product: {name: 'asc'}
@@ -672,9 +673,9 @@ export class ShopService {
         try {
             const { 
                 note, delivery_address, delivery_company, delivery_cost, delivery_cost_shop,
-                discount_percent, estimated_delivery, tracking_number, paid, total_cost,
+                estimated_delivery, tracking_number, paid, total_cost,
                 recipient_name, recipient_phone_number, createdAt, products_order,
-                shopuser_id, add_customer, surcharge, at_counter
+                shopuser_id, add_customer, surcharge, at_counter, promotion, total_discount
             } = createOrderDto
 
             const shopUser = await this.prisma.shopUser.findFirst({
@@ -701,7 +702,7 @@ export class ShopService {
                 data: {
                     delivery_address, delivery_company, 
                     delivery_cost, delivery_cost_shop, 
-                    discount_percent, tracking_number, 
+                    tracking_number, 
                     paid, total_cost, recipient_name,
                     recipient_phone_number, note,
                     surcharge, 
@@ -711,7 +712,9 @@ export class ShopService {
                     estimated_delivery: new Date(estimated_delivery), 
                     createdAt: new Date(createdAt), 
                     customer_id: newOrderCustomerId,
-                    shop_id: shopId
+                    shop_id: shopId,
+                    promotion_id: promotion ? promotion.id : null,
+                    total_discount
                 }
             })
             // create orderItem

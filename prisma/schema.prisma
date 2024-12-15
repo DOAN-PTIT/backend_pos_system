@@ -134,6 +134,7 @@ model Promotion {
   promotion_items PromotionItem[]
   shop_id         Int?
   shop            Shop?           @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  orders          Order[]
 }
 
 model Order {
@@ -141,7 +142,7 @@ model Order {
   note                   String?
   status                 Int
   delivery_cost_shop     Int?
-  discount_percent       Int?
+  total_discount       Int?
   paid                   Int?
   total_cost             Int
   estimated_delivery     DateTime    @db.Date
@@ -162,6 +163,8 @@ model Order {
   shopuser               ShopUser?   @relation(fields: [shopuser_id], references: [id], onDelete: SetNull)
   shop_id                Int?
   shop                   Shop?       @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  promotion_id           Int?
+  promotion              Promotion?  @relation(fields: [promotion_id], references: [id], onDelete: SetNull)
 }
 
 model OrderItem {

@@ -49,7 +49,7 @@ export class OrderService {
 
   async getOrderDetail(params: { id: number; shop_id: number }) {
     const { id, shop_id } = parse_to_int(params);
-    return await this.prisma.order.findUnique({
+    const order = await this.prisma.order.findUnique({
       where: {
         id,
         shop_id,
@@ -60,10 +60,12 @@ export class OrderService {
             variation: {
               include: {
                 product: true,
+                promotion_item: true,
               },
             },
           },
         },
+        promotion: true,
         shopuser: {
           include: {
             user: true,
@@ -72,6 +74,17 @@ export class OrderService {
         customer: true,
       },
     });
+
+    // parse promotion
+    if (order.promotion) {
+      order.promotion = {
+        ...order.promotion,
+        condition: JSON.parse(order.promotion.condition as string),
+        order_range: JSON.parse(order.promotion.order_range as string),
+      };
+    }
+
+    return order;
   }
 
   async updateOrder(id: number, shop_id: number, updateOrder: any) {

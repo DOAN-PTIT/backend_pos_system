@@ -50,7 +50,7 @@ export class PromotionService {
             variation: {
               include: {
                 product: true,
-              }
+              },
             },
           },
         },
@@ -160,5 +160,45 @@ export class PromotionService {
     }
 
     return promotion;
+  }
+
+  async findPromotionCanBeActive(params: any) {
+    const { shop_id, order_total, total_price, type } = params;
+    const promotions = await this.prisma.promotion.findMany({
+      where: {
+        shop_id,
+        type: parseInt(type),
+        status: 1,
+        start_date: {
+          lte: new Date(),
+        },
+        due_date: {
+          gte: new Date(),
+        },
+      },
+    });
+
+    const promotionCanBeActive = promotions
+      .filter((promotion: any) => {
+        const orderRange = JSON.parse(promotion.order_range);
+        const condition = JSON.parse(promotion.condition);
+        if (
+          parseInt(total_price) >= orderRange.min_value &&
+          parseInt(total_price) <= orderRange.max_value &&
+          parseInt(order_total) >= parseInt(condition.order_quantity)
+        ) {
+          return true;
+        }
+        return false;
+      })
+      .map((item: any) => {
+        return {
+          ...item,
+          condition: JSON.parse(item.condition as any),
+          order_range: JSON.parse(item.order_range as any),
+        };
+      });
+
+    return promotionCanBeActive;
   }
 }
