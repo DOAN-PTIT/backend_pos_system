@@ -340,21 +340,6 @@ export class ShopController {
         return await this.orderService.getOrderDetail(params)
     }
 
-    // OVERVIEW PAGE API
-    @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
-    @Post(':shopId/order-stat')
-    async orderStat (@Param('shopId') shopId: number) {
-        return await this.orderService.getOrderstat(shopId)
-    }
-
-    @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
-    @Get(':shopId/day-chart')
-    async dayChart (@Param('shopId') shopId: number) {
-        return await this.orderService.getDayChart(shopId)
-    }
-
     // Promotion
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
@@ -383,4 +368,41 @@ export class ShopController {
     async findPromotionCanBeActive (@Param('shopId') shopId: number, @Query() params: any) {
         return await this.promotionService.findPromotionCanBeActive({ ...params, shop_id: shopId })
     }
+
+    // OVERVIEW PAGE API
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/order-stat')
+    async orderStat (@Param('shopId') shopId: number) {
+        return await this.orderService.getOrderstat(shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/day-chart')
+    async dayChart (@Param('shopId') shopId: number) {
+        return await this.orderService.getDayChart(shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/product-stats')
+    async productStats (@Param('shopId') shopId: number) {
+        return await this.orderService.getProductStats(shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/employee-stats')
+    async employeeStats (@Param('shopId') shopId: number) {
+        return await this.orderService.getEmployeeStats(shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/today-stats')
+    async todayStats (@Param('shopId') shopId: number) {
+        return await this.orderService.getTodayRevenueStats(shopId)
+    }
+
 }

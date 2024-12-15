@@ -295,4 +295,197 @@ export class OrderService {
             }
         }
     }
+
+    async getProductStats (shop_id: number) {
+        // get shop products
+        const productStats = await this.prisma.product.findMany({
+            where: { shop_id },
+            include: {
+                variations: {
+                    include: {
+                        orderitems: {
+                            include: {
+                                order: true, // Join sang bảng Order
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        const result = productStats.map((product) => {
+            let totalRevenue = 0;
+            let totalOrders = 0;
+            const variationDetails = product.variations.map((variation) => {
+                const relevantOrderItems = variation.orderitems.filter(
+                    (item) => item.order && item.order.status === 4 // Chỉ tính đơn hoàn thành
+                );
+    
+                const variationRevenue = relevantOrderItems.reduce((sum, item) => {
+                    const price = item.order?.at_counter
+                        ? variation.price_at_counter // Giá tại quầy
+                        : variation.retail_price; // Giá online
+                    return sum + item.quantity * price;
+                }, 0);
+    
+                totalRevenue += variationRevenue;
+                totalOrders += new Set(relevantOrderItems.map((item) => item.order_id)).size;
+    
+                return {
+                    variation_id: variation.id,
+                    variation_code: variation.variation_code,
+                    revenue: variationRevenue,
+                    total_quantity: relevantOrderItems.reduce((sum, item) => sum + item.quantity, 0),
+                };
+            });
+    
+            return {
+                product_id: product.id,
+                product_name: product.name,
+                total_revenue: totalRevenue,
+                total_orders: totalOrders,
+                variations: variationDetails,
+            };
+        });
+
+        return result
+    }
+
+    async getEmployeeStats (shop_id: number) {
+        const employeesRevenue = await this.prisma.shopUser.findMany({
+            where: { shop_id },
+            include: {
+                user: true, // Lấy thông tin tên và email của nhân viên
+                orders: {
+                    where: { status: 4 }, // Chỉ lấy đơn hoàn thành
+                    include: {
+                        orderitems: {
+                            include: {
+                                variation: true, // Lấy giá bán từ Variation
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    
+        const result = employeesRevenue.map((employee) => {
+            let totalRevenue = 0;
+            let totalOrders = employee.orders.length;
+    
+            employee.orders.forEach((order) => {
+                order.orderitems.forEach((item) => {
+                    const price = order.at_counter
+                        ? item.variation?.price_at_counter // Giá bán tại quầy
+                        : item.variation?.retail_price; // Giá bán online
+                    totalRevenue += (item.quantity || 0) * (price || 0);
+                });
+            });
+    
+            return {
+                shopUser_id: employee.id,
+                name: employee.user?.name || "N/A", // Tên nhân viên
+                email: employee.user?.email || "N/A", // Email nhân viên
+                role: employee.role,
+                total_revenue: totalRevenue,
+                total_orders: totalOrders,
+            };
+        });
+    
+        return result;
+    }
+
+    async getTodayRevenueStats (shop_id: number) {
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+
+        const [
+            totalRevenueAndOrders, 
+            newOrdersCount, 
+            canceledOrdersCount, 
+            totalQuantitySold, 
+            newCustomersCount
+        ] = await Promise.all([
+            // Tổng doanh thu và số lượng đơn chốt
+            this.prisma.order.groupBy({
+                by: ['at_counter'],
+                where: {
+                    shop_id,
+                    status: 4, // Đơn hàng chốt
+                    createdAt: {
+                        gte: todayStart,
+                        lte: todayEnd,
+                    },
+                },
+                _sum: { total_cost: true },
+                _count: { id: true },
+            }),
+            // Số lượng đơn tạo mới
+            this.prisma.order.count({
+                where: {
+                    shop_id,
+                    createdAt: {
+                        gte: todayStart,
+                        lte: todayEnd,
+                    },
+                },
+            }),
+            // Số lượng đơn bị hủy
+            this.prisma.order.count({
+                where: {
+                    shop_id,
+                    status: -1, 
+                    createdAt: {
+                        gte: todayStart,
+                        lte: todayEnd,
+                    },
+                },
+            }),
+            // Số lượng hàng bán ra
+            this.prisma.orderItem.aggregate({
+                _sum: { quantity: true },
+                where: {
+                    order: {
+                        shop_id,
+                        status: 4, 
+                        createdAt: {
+                            gte: todayStart,
+                            lte: todayEnd,
+                        },
+                    },
+                },
+            }),
+            // Số khách hàng mới
+            this.prisma.customer.count({
+                where: {
+                    createdAt: {
+                        gte: todayStart,
+                        lte: todayEnd,
+                    },
+                    shopcustomers: {
+                        some: { shop_id },
+                    },
+                },
+            }),
+        ]);
+
+        const totalRevenueOnline = totalRevenueAndOrders.find((item) => !item.at_counter)?._sum?.total_cost || 0;
+        const totalRevenueAtCounter = totalRevenueAndOrders.find((item) => item.at_counter)?._sum?.total_cost || 0;
+        const totalOrdersOnline = totalRevenueAndOrders.find((item) => !item.at_counter)?._count?.id || 0;
+        const totalOrdersAtCounter = totalRevenueAndOrders.find((item) => item.at_counter)?._count?.id || 0;
+
+        return {
+            totalRevenueOnline,
+            totalOrdersOnline,
+            totalRevenueAtCounter,
+            totalOrdersAtCounter,
+            newOrdersCount,
+            canceledOrdersCount,
+            totalQuantitySold: totalQuantitySold._sum.quantity || 0,
+            newCustomersCount,
+        };
+    }
 }

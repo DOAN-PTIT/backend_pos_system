@@ -678,9 +678,12 @@ export class ShopService {
                 shopuser_id, add_customer, surcharge, at_counter, promotion, total_discount
             } = createOrderDto
 
-            const shopUser = await this.prisma.shopUser.findFirst({
-                where: { user_id: shopuser_id, shop_id: shopId }
+            const shopUser = await this.prisma.shopUser.findUnique({
+                where: { id: shopuser_id }
             })
+            if (!shopUser) {
+                throw new BadRequestException('shopUser not found')
+            } 
             
             // check customer existed?
             const foundCustomer = await this.customerService.findByEmailOrPhoneNumberForShop(
