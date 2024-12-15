@@ -28,6 +28,7 @@ export class OrderService {
         createdAt: 'desc',
       },
       include: {
+        promotion: true,
         orderitems: {
           include: {
             variation: {
@@ -86,108 +87,6 @@ export class OrderService {
 
     return order;
   }
-
-  async updateOrder(id: number, shop_id: number, updateOrder: any) {
-    delete updateOrder.id;
-    const { orderitems, shopuser, customer, add_customer, ...newOrder } =
-      updateOrder;
-    const order = await this.prisma.order.findUnique({
-      where: {
-        id,
-        shop_id,
-      },
-    });
-    const orderUpdate = await this.prisma.order.update({
-      where: {
-        id,
-        shop_id,
-      },
-      data: {
-        ...newOrder,
-        customer_id: add_customer ? add_customer?.id : order.customer_id,
-      },
-    });
-
-    await this.prisma.orderItem.deleteMany({
-      where: {
-        order_id: id,
-      },
-    });
-    await Promise.all(
-      orderitems.map((productOrder) => {
-        return this.prisma.orderItem.create({
-          data: {
-            product_id: productOrder.product_id,
-            variation_id: productOrder.variation_id,
-    constructor(private prisma: PrismaService) {}
-
-    async getListOrder(params: {
-        page: number;
-        page_size: number;
-        shop_id: number;
-    }) {
-        const { page, page_size, shop_id } = parse_to_int(params);
-        const skip = (page - 1) * page_size;
-        const total = await this.prisma.order.count({
-        where: {
-            shop_id,
-        },
-        });
-        const data = await this.prisma.order.findMany({
-        where: {
-            shop_id,
-        },
-        skip,
-        take: page_size,
-        orderBy: {
-            createdAt: 'desc',
-        },
-        include: {
-            orderitems: {
-            include: {
-                variation: {
-                include: {
-                    product: true,
-                },
-                },
-            },
-            },
-            customer: true,
-        },
-        });
-
-        return {
-        totalEntries: total,
-        data,
-        };
-    }
-
-    async getOrderDetail(params: { id: number; shop_id: number }) {
-        const { id, shop_id } = parse_to_int(params);
-        return await this.prisma.order.findUnique({
-        where: {
-            id,
-            shop_id,
-        },
-        include: {
-            orderitems: {
-            include: {
-                variation: {
-                include: {
-                    product: true,
-                },
-                },
-            },
-            },
-            shopuser: {
-            include: {
-                user: true,
-            },
-            },
-            customer: true,
-        },
-        });
-    }
 
     async updateOrder(id: number, shop_id: number, updateOrder: any) {
         delete updateOrder.id;
