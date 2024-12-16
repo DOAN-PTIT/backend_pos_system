@@ -277,16 +277,16 @@ export class OrderService {
         return {
             box: {
                 total: {
-                    amount: online[0]._sum.total_cost + counter[0]._sum.total_cost,
-                    order: online[0]._count.at_counter + counter[0]._count.at_counter
+                    amount: (online[0]?._sum?.total_cost || 0) + (counter[0]?._sum?.total_cost || 0),
+                    order: (online[0]?._count?.at_counter || 0) + (counter[0]?._count?.at_counter || 0),
                 },
                 online: {
-                    amount: online[0]._sum.total_cost,
-                    order: online[0]._count.at_counter,
+                    amount: online[0]?._sum?.total_cost || 0,
+                    order: online[0]?._count?.at_counter || 0,
                 },
                 counter: {
-                    amount: counter[0]._sum.total_cost,
-                    order: counter[0]._count.at_counter,
+                    amount: counter[0]?._sum?.total_cost || 0,
+                    order: counter[0]?._count?.at_counter || 0,
                 },
             },
             chart: {
@@ -316,7 +316,7 @@ export class OrderService {
         const result = productStats.map((product) => {
             let totalRevenue = 0;
             let totalOrders = 0;
-            const variationDetails = product.variations.map((variation) => {
+            let variationDetails = product.variations.map((variation) => {
                 const relevantOrderItems = variation.orderitems.filter(
                     (item) => item.order && item.order.status === 4 // Chỉ tính đơn hoàn thành
                 );
@@ -338,6 +338,8 @@ export class OrderService {
                     total_quantity: relevantOrderItems.reduce((sum, item) => sum + item.quantity, 0),
                 };
             });
+
+            variationDetails = variationDetails.filter((variation) => variation.revenue > 0);
     
             return {
                 product_id: product.id,
@@ -348,7 +350,7 @@ export class OrderService {
             };
         });
 
-        return result
+        return result.filter((product) => product.total_revenue > 0 || product.total_orders > 0);
     }
 
     async getEmployeeStats (shop_id: number) {
