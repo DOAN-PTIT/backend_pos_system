@@ -91,6 +91,14 @@ export class CustomerService {
                     customer_id,
                     shop_id,
                 },
+                include: {
+                    orderitems: {
+                        include: {
+                            variation: true,
+                            product: true,
+                        }
+                    }
+                }
             }),
             this.prisma.order.count({
                 where: {
@@ -102,7 +110,7 @@ export class CustomerService {
 
         return {
             customer: customerInfo,
-            order: {
+            orders: {
                 orders,
                 count
             }
