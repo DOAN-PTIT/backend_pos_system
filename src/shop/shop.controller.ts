@@ -39,6 +39,7 @@ import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
 import { UsersService } from 'src/users/users.service';
 import { ProductService } from 'src/product/product.service';
 import { PromotionService } from 'src/promotion/promotion.service';
+import { UpdateCustomerDto } from 'src/customer/dto/update-customer.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -290,6 +291,17 @@ export class ShopController {
     async removeCustomer (@Param('shopId') shopId: number, @Param('customerId') customerId: number): Promise<any> {
         
         return await this.shopService.removeCustomer(shopId, customerId);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/customer/:customerId/update')
+    async updateCustomer (
+        @Param('shopId') shopId: number, 
+        @Param('customerId') customerId: number,
+        @Body() updateCustomerDto: UpdateCustomerDto
+    ) {
+        return await this.customerService.updateCustomer(customerId, shopId, updateCustomerDto);
     }
 
     @Roles(Role.Admin, Role.User)
