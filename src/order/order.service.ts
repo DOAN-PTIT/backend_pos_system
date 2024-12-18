@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { parse_to_int } from 'src/utils/tools';
+import { OrderStatus } from './dto/update-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -108,6 +109,17 @@ export class OrderService {
             customer_id: add_customer ? add_customer?.id : order.customer_id,
         },
         });
+
+        // update customer last_purchase
+        const foundCustomer = await this.prisma.customer.findUnique({ 
+            where: { id: order.customer_id }
+        })
+        if (foundCustomer && orderUpdate.status === OrderStatus.DELIVERED) {
+            await this.prisma.customer.update({
+                where: { id: customer.id },
+                data: { last_purchase: orderUpdate.updatedAt }
+            })
+        }
 
         await this.prisma.orderItem.deleteMany({
         where: {
