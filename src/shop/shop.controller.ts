@@ -107,6 +107,17 @@ export class ShopController {
         return await this.shopService.deleteShop(shopId)
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(":shopId/leave")
+    async leaveShop (
+        @Param('shopId', ParseIntPipe) shopId: number,
+        @Req() req: Request
+    ) {
+        const userId = req.user.id;
+        return await this.shopService.leaveShop(shopId, userId)
+    }
+
     // Products
     @Roles(Role.User, Role.Admin)
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
