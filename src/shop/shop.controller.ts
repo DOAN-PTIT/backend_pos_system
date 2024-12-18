@@ -108,7 +108,6 @@ export class ShopController {
     }
 
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Get(":shopId/leave")
     async leaveShop (
         @Param('shopId', ParseIntPipe) shopId: number,
