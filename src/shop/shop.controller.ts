@@ -42,6 +42,7 @@ import { PromotionService } from 'src/promotion/promotion.service';
 import { SupplierService } from 'src/supplier/supplier.service';
 import { PurchaseService } from 'src/purchase/purchase.service';
 import { DebtService } from 'src/debt/debt.service';
+import { UpdateCustomerDto } from 'src/customer/dto/update-customer.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -110,6 +111,16 @@ export class ShopController {
     @Delete(":shopId")
     async deleteShop (@Param('shopId', ParseIntPipe) shopId: number): Promise<any> {
         return await this.shopService.deleteShop(shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @Get(":shopId/leave")
+    async leaveShop (
+        @Param('shopId', ParseIntPipe) shopId: number,
+        @Req() req: Request
+    ) {
+        const userId = req.user.id;
+        return await this.shopService.leaveShop(shopId, userId)
     }
 
     // Products
@@ -296,6 +307,17 @@ export class ShopController {
     async removeCustomer (@Param('shopId') shopId: number, @Param('customerId') customerId: number): Promise<any> {
         
         return await this.shopService.removeCustomer(shopId, customerId);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/customer/:customerId/update')
+    async updateCustomer (
+        @Param('shopId') shopId: number, 
+        @Param('customerId') customerId: number,
+        @Body() updateCustomerDto: UpdateCustomerDto
+    ) {
+        return await this.customerService.updateCustomer(customerId, shopId, updateCustomerDto);
     }
 
     @Roles(Role.Admin, Role.User)

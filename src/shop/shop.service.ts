@@ -859,4 +859,26 @@ export class ShopService {
         })
     }
 
+    async leaveShop (shop_id: number, user_id: number) {
+        const shopUser = await this.prisma.shopUser.findFirst({
+            where: { 
+                shop_id,
+                user_id,
+            }
+        })
+        if (!shopUser) {
+            throw new BadRequestException('You already leave or no longger belong to this shop')
+        }
+
+        if (shopUser.role === RoleShop.Owner) {
+            throw new BadRequestException('You cannot leave this shop which you are an Owner')
+        }
+
+        return this.prisma.shopUser.delete({
+            where: { 
+                id: shopUser.id,
+            }
+        })
+    }
+
 }

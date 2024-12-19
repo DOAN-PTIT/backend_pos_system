@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, IsString, IsEnum, IsOptional, IsDateString } from "class-validator";
 import { Transform } from 'class-transformer';
 
-enum Gender {
+export enum Gender {
     MALE = "MALE",
     FEMALE = "FEMALE",
     OTHER = "OTHER",

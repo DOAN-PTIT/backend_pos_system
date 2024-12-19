@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { parse_to_int } from 'src/utils/tools';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomerService {
@@ -115,5 +116,33 @@ export class CustomerService {
                 count
             }
         }
+    }
+
+    async updateCustomer (customer_id: number, shop_id: number, updateCustomerDto: UpdateCustomerDto) {
+        const customerInfo = await this.prisma.customer.findUnique({
+            where: { id: customer_id }
+        })
+        if (!customerInfo) {
+            throw new BadRequestException('Customer not found')
+        }
+        
+        const shopCustomer = await this.prisma.shopCustomer.findFirst({
+            where: {
+                shop_id,
+                customer_id,
+            }
+        })
+        if (!shopCustomer) {
+            throw new BadRequestException('Customer not belong to this shop')
+        }
+
+        let { date_of_birth, last_purchase, ...updateBody } = updateCustomerDto
+        updateBody['date_of_birth'] = date_of_birth ? new Date(date_of_birth) : customerInfo.date_of_birth
+        updateBody['last_purchase'] = last_purchase ? new Date(last_purchase) : customerInfo.last_purchase
+
+        return await this.prisma.customer.update({
+            where: { id: customer_id },
+            data: updateBody
+        })
     }
 }
