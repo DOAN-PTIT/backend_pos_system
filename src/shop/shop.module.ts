@@ -11,14 +11,30 @@ import { OrderModule } from 'src/order/order.module';
 import { UsersModule } from 'src/users/users.module';
 import { ProductModule } from 'src/product/product.module';
 import { PromotionService } from 'src/promotion/promotion.service';
+import { SupplierService } from 'src/supplier/supplier.service';
+import { PurchaseService } from 'src/purchase/purchase.service';
+import { DebtService } from 'src/debt/debt.service';
 
 @Module({
   imports: [
-    CloudinaryModule, AuthModule, CustomerModule, OrderModule, ProductModule,
-    forwardRef(() => UsersModule)
+    CloudinaryModule,
+    AuthModule,
+    CustomerModule,
+    OrderModule,
+    ProductModule,
+    forwardRef(() => UsersModule),
   ],
-  providers: [ShopService, PrismaService, ShopRepository, UserRepository, PromotionService],
+  providers: [
+    ShopService,
+    PrismaService,
+    ShopRepository,
+    UserRepository,
+    PromotionService,
+    SupplierService,
+    PurchaseService,
+    DebtService,
+  ],
   controllers: [ShopController],
-  exports: [ShopRepository]
+  exports: [ShopRepository],
 })
 export class ShopModule {}

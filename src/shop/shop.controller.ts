@@ -39,6 +39,9 @@ import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
 import { UsersService } from 'src/users/users.service';
 import { ProductService } from 'src/product/product.service';
 import { PromotionService } from 'src/promotion/promotion.service';
+import { SupplierService } from 'src/supplier/supplier.service';
+import { PurchaseService } from 'src/purchase/purchase.service';
+import { DebtService } from 'src/debt/debt.service';
 import { UpdateCustomerDto } from 'src/customer/dto/update-customer.dto';
 
 @Controller('shop')
@@ -51,7 +54,10 @@ export class ShopController {
         private customerService: CustomerService,
         private userService: UsersService,
         private productService: ProductService,
-        protected promotionService: PromotionService
+        private promotionService: PromotionService,
+        private supplierService: SupplierService,
+        private purchaseService: PurchaseService,
+        private debtService: DebtService
     ) {}
 
     // Shop general
@@ -425,6 +431,79 @@ export class ShopController {
     @Get(':shopId/today-stats')
     async todayStats (@Param('shopId') shopId: number) {
         return await this.orderService.getTodayRevenueStats(shopId)
+    }
+
+    // Supplier
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/supplier/create')
+    async createSupplier (@Param('shopId') shopId: number, @Body() body: any) {
+        return await this.supplierService.createSupplier({ ...body, shop_id: shopId })
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/suppliers')
+    async getSuppliers (@Param('shopId') shopId: number, @Query() params: any) {
+        return await this.supplierService.getListSupplier({ ...params, shop_id: shopId })
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/supplier/:supplierId')
+    async getSupplierById (@Param('shopId') shopId: number, @Param('supplierId') supplierId: number) {
+        return await this.supplierService.getSupplierById(supplierId, shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/supplier/:supplierId/update')
+    async updateSupplier (@Param('shopId') shopId: number, @Param('supplierId') supplierId: number, @Body() body: any) {
+        return await this.supplierService.updateSupplier(supplierId, shopId, body)
+    }
+
+    // Purchase
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/purchase/create')
+    async createPurchase (@Param('shopId') shopId: number, @Body() body: any) {
+        return await this.purchaseService.createPurchase({ ...body, shop_id: shopId })
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/purchases')
+    async getPurchases (@Param('shopId') shopId: number, @Query() params: any) {
+        return await this.purchaseService.getListPurchase({ ...params, shop_id: shopId })
+    }
+
+    // Debt
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/debt/create')
+    async createDebt (@Param('shopId') shopId: number, @Body() body: any) {
+        return await this.debtService.createDebt(body, shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/debts')
+    async getDebts (@Param('shopId') shopId: number, @Query() params: any) {
+        return await this.debtService.getListDebts(params, shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/debt/:debtId')
+    async getDebtById (@Param('shopId') shopId: number, @Param('debtId') debtId: number) {
+        return await this.debtService.getDebtById(debtId, shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/debt/:debtId/update')
+    async updateDebt (@Param('shopId') shopId: number, @Param('debtId') debtId: number, @Body() body: any) {
+        return await this.debtService.updateDebt(debtId, shopId, body)
     }
 
 }

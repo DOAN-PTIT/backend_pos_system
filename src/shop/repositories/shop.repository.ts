@@ -51,6 +51,9 @@ export class ShopRepository {
         try {
             const shop: Shop = await this.prisma.shop.findUnique({
                 where: {id: shopId},
+                include: {
+                    suppliers: true,
+                }
             })
 
             return shop
