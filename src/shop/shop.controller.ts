@@ -477,6 +477,20 @@ export class ShopController {
         return await this.purchaseService.getListPurchase({ ...params, shop_id: shopId })
     }
 
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/purchase/:purchaseId')
+    async getPurchaseById (@Param('shopId') shopId: number, @Param('purchaseId') purchaseId: number) {
+        return await this.purchaseService.getPurchaseDetail(shopId, purchaseId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/purchase/:purchaseId/update')
+    async updatePurchase (@Param('shopId') shopId: number, @Param('purchaseId') purchaseId: number, @Body() body: any) {
+        return await this.purchaseService.updatePurchase(shopId, purchaseId, body)
+    }
+
     // Debt
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
