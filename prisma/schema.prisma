@@ -52,6 +52,9 @@ model Shop {
   shopsetting   ShopSetting?
   shopcustomers ShopCustomer[]
   orders        Order[]
+  suppliers     Supplier[]
+  purchase      Purchases[]
+  debts         Debt[]
 }
 
 model ShopSetting {
@@ -105,19 +108,21 @@ model Categories {
 }
 
 model Variation {
-  id               Int            @id @default(autoincrement())
-  retail_price     Int
-  image            String
-  amount           Int
-  barcode          String         @unique
-  variation_code   String         @unique
-  price_at_counter Int
-  updatedAt        DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
-  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
-  product_id       Int?
-  product          Product?       @relation(fields: [product_id], references: [id], onDelete: SetNull)
-  orderitems       OrderItem[]
-  promotion_item   PromotionItem?
+  id                  Int            @id @default(autoincrement())
+  retail_price        Int
+  image               String
+  amount              Int
+  barcode             String         @unique
+  variation_code      String         @unique
+  price_at_counter    Int
+  last_imported_price Int?
+  updatedAt           DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt           DateTime       @default(now()) @db.Timestamptz(6)
+  product_id          Int?
+  product             Product?       @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  orderitems          OrderItem[]
+  promotion_item      PromotionItem?
+  purchase_item       PurchaseItem[]
 }
 
 model Promotion {
@@ -142,7 +147,7 @@ model Order {
   note                   String?
   status                 Int
   delivery_cost_shop     Int?
-  total_discount       Int?
+  total_discount         Int?
   paid                   Int?
   total_cost             Int
   estimated_delivery     DateTime    @db.Date
@@ -217,4 +222,64 @@ model PromotionItem {
   is_discount_percent Boolean
   discount            Int
   max_discount        Int
+}
+
+model Supplier {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+  name          String
+  supplier_code String?
+  phone_number  String?
+  address       String?
+  description   String?
+  is_active     Boolean     @default(true)
+  shop_id       Int?
+  shop          Shop?       @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  purchases     Purchases[]
+  debt          Debt[]
+}
+
+model Purchases {
+  id           Int            @id @default(autoincrement())
+  product_fee  Int
+  shipping_fee Int?
+  discount     Int?
+  total_price  Int?
+  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
+  note         String?
+  shop_id      Int?
+  status       Int            @default(0)
+  shop         Shop?          @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  items        PurchaseItem[]
+  supplier_id  Int?
+  supplier     Supplier?      @relation(fields: [supplier_id], references: [id], onDelete: SetNull)
+  debt         Debt[]
+}
+
+model PurchaseItem {
+  id             Int        @id @default(autoincrement())
+  quantity       Int
+  imported_price Int
+  variation_id   Int
+  variation      Variation? @relation(fields: [variation_id], references: [id], onDelete: SetNull)
+  purchase_id    Int
+  purchase       Purchases  @relation(fields: [purchase_id], references: [id], onDelete: SetNull)
+}
+
+model Debt {
+  id             Int        @id @default(autoincrement())
+  name           String
+  purchase_date  DateTime?  @default(now()) @db.Timestamptz(6)
+  deal_date      DateTime?  @default(now()) @db.Timestamptz(6)
+  created_at      DateTime?  @default(now()) @db.Timestamptz(6)
+  description String?
+  money_must_pay Int
+  status         Int?       @default(0)
+  supplier_id    Int?
+  supplier       Supplier?  @relation(fields: [supplier_id], references: [id], onDelete: SetNull)
+  purchase_id    Int?
+  purchase       Purchases? @relation(fields: [purchase_id], references: [id], onDelete: SetNull)
+  shop_id        Int?
+  shop           Shop?      @relation(fields: [shop_id], references: [id], onDelete: SetNull)
 }
