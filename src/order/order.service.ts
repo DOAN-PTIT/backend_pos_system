@@ -91,14 +91,25 @@ export class OrderService {
 
     async updateOrder(id: number, shop_id: number, updateOrder: any) {
         delete updateOrder.id;
-        const { orderitems, shopuser, customer, add_customer, ...newOrder } =
-        updateOrder;
         const order = await this.prisma.order.findUnique({
         where: {
             id,
             shop_id,
         },
         });
+        if (updateOrder.status) {
+            return await this.prisma.order.update({
+                where: {
+                    id,
+                    shop_id,
+                },
+                data: {
+                    status: parse_to_int(updateOrder.status),
+                },
+            })
+        }
+        const { orderitems, shopuser, customer, add_customer, ...newOrder } =
+        updateOrder;
         const orderUpdate = await this.prisma.order.update({
         where: {
             id,
