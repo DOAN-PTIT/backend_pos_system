@@ -55,6 +55,17 @@ export class DebtService {
   }
 
   async updateDebt(id: number, shop_id: number, params: any): Promise<any> {
+    if (params.status) {
+      return await this.prisma.debt.update({
+        where: {
+          id,
+          shop_id,
+        },
+        data: {
+          status: parse_to_int(params.status),
+        },
+      });
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { supplier, purchase, ...res } = params;
 
