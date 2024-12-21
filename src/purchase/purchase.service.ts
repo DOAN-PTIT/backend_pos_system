@@ -128,6 +128,17 @@ export class PurchaseService {
   }
 
   async updatePurchase(shop_id: number, id: number, data: any): Promise<any> {
+    if (data.status) {
+      return await this.prisma.purchases.update({
+        where: {
+          id,
+          shop_id,
+        },
+        data: {
+          status: parse_to_int(data.status),
+        },
+      });
+    }
     const { items, supplier_id, shop_user_id, ...purchase } = data;
     delete purchase.id;
     delete purchase.shop_id;
