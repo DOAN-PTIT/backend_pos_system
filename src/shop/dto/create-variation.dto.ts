@@ -29,7 +29,6 @@ export class CreateVariationDto {
     @IsOptional()
     image_url_fb: string;
 
-    @IsNumber()
     @IsOptional()
-    last_imported_price?: number
+    last_imported_price?: any
 }
