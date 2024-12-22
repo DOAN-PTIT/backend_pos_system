@@ -17,6 +17,7 @@ import { CustomerService } from 'src/customer/customer.service';
 import { CreateVariationDto } from './dto/create-variation.dto';
 import { Prisma } from '@prisma/client';
 import { AddEmployeeDto } from './dto/add-employee.dto';
+import { OrderStatus } from 'src/order/dto/update-order.dto';
 
 @Injectable()
 export class ShopService {
@@ -879,6 +880,102 @@ export class ShopService {
                 id: shopUser.id,
             }
         })
+    }
+
+    async getRevenueStatsByMonth (shop_id: number, year: number, month?: number) {
+        let revenuePeriod: any
+        
+        if (month) {
+            revenuePeriod = await this.prisma.$queryRaw`
+                SELECT 
+                    TO_CHAR(DATE("createdAt"), 'DD-MM-YYYY') AS day, 
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "total_cost" ELSE 0 END)::numeric AS revenue,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "delivery_cost" ELSE 0 END)::numeric AS delivery_cost,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "delivery_cost_shop" ELSE 0 END)::numeric AS delivery_cost_shop,
+                    COUNT(*) FILTER (
+                        WHERE "status" = ${OrderStatus.DELIVERED} 
+                        OR "status" = ${OrderStatus.APPROVED}
+                        OR "status" = ${OrderStatus.SHIPPED} 
+                    )::numeric AS received_orders,
+                    COUNT(*) FILTER (WHERE "status" = ${OrderStatus.CANCELED})::numeric AS returned_orders,
+                    ARRAY_AGG("id") AS order_ids
+                FROM "Order"
+                WHERE "shop_id" = ${shop_id}
+                AND EXTRACT(YEAR FROM "createdAt") = ${year}::integer
+                AND EXTRACT(MONTH FROM "createdAt") = ${month}::integer
+                GROUP BY DATE("createdAt")
+                ORDER BY day DESC;
+            `;
+        } else {
+            revenuePeriod = await this.prisma.$queryRaw`
+                SELECT 
+                    TO_CHAR(DATE_TRUNC('month', "createdAt"), 'MM-YYYY') AS month,  
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "total_cost" ELSE 0 END)::numeric AS revenue,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "delivery_cost" ELSE 0 END)::numeric AS delivery_cost,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "delivery_cost_shop" ELSE 0 END)::numeric AS delivery_cost_shop,
+                    COUNT(*) FILTER (
+                        WHERE "status" = ${OrderStatus.DELIVERED} 
+                        OR "status" = ${OrderStatus.APPROVED}
+                        OR "status" = ${OrderStatus.SHIPPED} 
+                    )::numeric AS received_orders,
+                    COUNT(*) FILTER (WHERE "status" = ${OrderStatus.CANCELED})::numeric AS returned_orders,
+                    ARRAY_AGG("id") AS order_ids
+                FROM "Order"
+                WHERE "shop_id" = ${shop_id}
+                AND EXTRACT(YEAR FROM "createdAt") = ${year}::integer
+                GROUP BY DATE_TRUNC('month', "createdAt")
+                ORDER BY month ASC;
+            `;
+        }
+
+        let allPeriods = [];
+        if (month) {
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0);
+            for (let i = startDate.getDate(); i <= endDate.getDate(); i++) {
+                const day = new Date(year, month - 1, i);
+                // DD-MM-YYYY
+                const formattedDay = `${String(day.getDate()).padStart(2, '0')}-${String(day.getMonth() + 1).padStart(2, '0')}-${day.getFullYear()}`;
+                allPeriods.push(formattedDay);
+            }
+        } else {
+            // Tạo danh sách các tháng trong năm
+            for (let i = 1; i <= 12; i++) {
+                const monthString = `${i.toString().padStart(2, '0')}-${year}`;  // MM-YYYY
+                allPeriods.push(monthString);
+            }
+        }
+
+        const revenueStats = [];
+        for (let period of allPeriods) {
+            const periodData = revenuePeriod.find(item => item.day === period || item.month === period);
+            const order_ids = periodData?.order_ids || [];
+            
+            let totalImportCost = { total_import_cost: 0 };
+            if (order_ids.length > 0) {
+                const result = await this.prisma.$queryRaw`
+                    SELECT 
+                        SUM(oi.quantity * v.last_imported_price)::numeric AS total_import_cost
+                    FROM "OrderItem" oi
+                    INNER JOIN "Variation" v ON oi.variation_id = v.id
+                    WHERE oi.order_id IN (${Prisma.join(order_ids)});
+                `;
+                totalImportCost = result[0];
+            }
+
+            revenueStats.push({
+                period,
+                revenue: periodData?.revenue || 0,
+                delivery_cost: periodData?.delivery_cost || 0,
+                delivery_cost_shop: periodData?.delivery_cost_shop || 0,
+                received_orders: periodData?.received_orders || 0,
+                returned_orders: periodData?.returned_orders || 0,
+                total_items_cost: totalImportCost?.total_import_cost || 0,
+                total_profit: (periodData?.revenue || 0) - (totalImportCost?.total_import_cost || 0),
+            });
+        }
+
+        return revenueStats
     }
 
 }

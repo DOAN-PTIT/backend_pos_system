@@ -520,4 +520,19 @@ export class ShopController {
         return await this.debtService.updateDebt(debtId, shopId, body)
     }
 
+    // STATS PAGE API
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/revenue-stats')    
+    async revenueStatsByMonth (
+        @Param('shopId') shopId: number,
+        @Query() query: {  
+            month?: number,
+            year: number,
+        }
+    ) {
+        const { month = undefined, year } = query
+        return this.shopService.getRevenueStatsByMonth(shopId, year, month)
+    }
+
 }
