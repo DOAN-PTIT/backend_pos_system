@@ -889,7 +889,9 @@ export class ShopService {
             revenuePeriod = await this.prisma.$queryRaw`
                 SELECT 
                     TO_CHAR(DATE("createdAt"), 'DD-MM-YYYY') AS day, 
-                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "total_cost" ELSE 0 END)::numeric AS revenue,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "total_cost" ELSE 0 END)::numeric AS sales,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "total_cost" - COALESCE("total_discount", 0) ELSE 0 END)::numeric AS revenue,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN COALESCE("total_discount", 0) ELSE 0 END)::numeric AS total_discount,
                     SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "delivery_cost" ELSE 0 END)::numeric AS delivery_cost,
                     SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "delivery_cost_shop" ELSE 0 END)::numeric AS delivery_cost_shop,
                     COUNT(*) FILTER (
@@ -909,8 +911,11 @@ export class ShopService {
         } else {
             revenuePeriod = await this.prisma.$queryRaw`
                 SELECT 
-                    TO_CHAR(DATE_TRUNC('month', "createdAt"), 'MM-YYYY') AS month,  
-                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "total_cost" ELSE 0 END)::numeric AS revenue,
+                    TO_CHAR(DATE_TRUNC('month', "createdAt"), 'MM-YYYY') AS month,
+                    COUNT(*)::numeric AS total_orders,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "total_cost" ELSE 0 END)::numeric AS sales,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "total_cost" - COALESCE("total_discount", 0) ELSE 0 END)::numeric AS revenue,
+                    SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN COALESCE("total_discount", 0) ELSE 0 END)::numeric AS total_discount,
                     SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "delivery_cost" ELSE 0 END)::numeric AS delivery_cost,
                     SUM(CASE WHEN "status" = ${OrderStatus.DELIVERED} THEN "delivery_cost_shop" ELSE 0 END)::numeric AS delivery_cost_shop,
                     COUNT(*) FILTER (
@@ -972,6 +977,9 @@ export class ShopService {
                 returned_orders: periodData?.returned_orders || 0,
                 total_items_cost: totalImportCost?.total_import_cost || 0,
                 total_profit: (periodData?.revenue || 0) - (totalImportCost?.total_import_cost || 0),
+                total_discount: periodData?.total_discount || 0,
+                sales: periodData?.sales || 0,
+                total_orders: periodData?.total_orders || 0,
             });
         }
 
