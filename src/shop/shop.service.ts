@@ -580,6 +580,27 @@ export class ShopService {
                 })
             ]) 
 
+            await Promise.all(
+                customers.map(async (customer) => {
+                    const totalSpent = await this.prisma.order.aggregate({
+                        _sum: {
+                            total_cost: true 
+                        },
+                        _count: {
+                            _all: true,
+                        },
+                        where: {
+                            customer_id: customer.id,
+                            shop_id: shopId,
+                            status: OrderStatus.DELIVERED
+                        }
+                    })
+                    customer['total_spent'] = totalSpent._sum.total_cost || 0
+                    customer['order_count'] = totalSpent._count._all || 0
+                    return customer;
+                })
+            )
+
             return { customers, totalCount }
         } catch (error) {
             console.log(error)

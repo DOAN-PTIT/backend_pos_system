@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { parse_to_int } from 'src/utils/tools';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { OrderStatus } from 'src/order/dto/update-order.dto';
 
 @Injectable()
 export class CustomerService {
@@ -36,31 +37,54 @@ export class CustomerService {
 
         const searchConfig = { contains: searchTerm, mode: 'insensitive' as const };
         const baseCondition = {
-        shopcustomers: { some: { shop_id: shopId } },
+            shopcustomers: { some: { shop_id: shopId } },
         };
 
         const fieldSearchMap = {
-        name: { name: searchConfig },
-        email: { email: searchConfig },
-        phone_number: { phone_number: searchConfig },
+            name: { name: searchConfig },
+            email: { email: searchConfig },
+            phone_number: { phone_number: searchConfig },
         };
 
-        return this.prisma.customer.findMany({
-        where: {
-            AND: [
-            baseCondition,
-            field
-                ? fieldSearchMap[field]
-                : {
-                    OR: [
-                    { name: searchConfig },
-                    { email: searchConfig },
-                    { phone_number: searchConfig },
-                    ],
-                },
-            ],
-        },
+        const customers = await this.prisma.customer.findMany({
+            where: {
+                AND: [
+                baseCondition,
+                field
+                    ? fieldSearchMap[field]
+                    : {
+                        OR: [
+                        { name: searchConfig },
+                        { email: searchConfig },
+                        { phone_number: searchConfig },
+                        ],
+                    },
+                ],
+            },
         });
+
+        await Promise.all(
+            customers.map(async (customer) => {
+                const totalSpent = await this.prisma.order.aggregate({
+                    _sum: {
+                        total_cost: true 
+                    },
+                    _count: {
+                        _all: true,
+                    },
+                    where: {
+                        customer_id: customer.id,
+                        shop_id: shopId,
+                        status: OrderStatus.DELIVERED
+                    }
+                })
+                customer['total_spent'] = totalSpent._sum.total_cost || 0
+                customer['order_count'] = totalSpent._count._all || 0
+                return customer;
+            })
+        )
+
+        return customers
     }
 
     async getDetailCustomer (customer_id: number, shop_id: number, page: number = 1) {
