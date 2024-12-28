@@ -472,25 +472,44 @@ export class ShopService {
 
     async searchEmployee (shopId: number, searchKey: string = '') {
         try {
-            const employees = await this.prisma.shopUser.findMany({
+            const employees = await this.prisma.user.findMany({
                 where: {
                     AND: [
-                        { shop_id: shopId },
                         {
-                            user: {
-                                name: {
-                                    contains: searchKey,
-                                    mode: 'insensitive'
+                            shopusers: { 
+                                some: { 
+                                    shop_id: shopId, 
+                                    // role: Role.Employee 
                                 }
+                            }
+                        },
+                        {
+                            name: {
+                                contains: searchKey,
+                                mode: 'insensitive'
                             }
                         }
                     ]
                 },
-                include: { user: true },
+                select: {
+                    id: true, name: true, email: true, 
+                    phone_number: true, date_of_birth: true, 
+                    createdAt: true, avatar: true,
+                    shopusers: {
+                        where: { shop_id: shopId },
+                        select: {
+                            id: true,
+                            role: true,
+                            createdAt: true,
+                            user_id: true,
+                            shop_id: true,
+                        },
+                    },
+                },
                 orderBy: {
-                    user : { name: 'asc' }
+                    name: 'asc' 
                 }
-            });
+            })
 
             return employees
         } catch (error) {
