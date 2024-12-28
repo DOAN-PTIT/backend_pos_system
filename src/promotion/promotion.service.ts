@@ -10,8 +10,9 @@ export class PromotionService {
     page: number;
     page_size: number;
     shop_id: number;
+    search?: string;
   }) {
-    const { page, page_size, shop_id } = parse_to_int(params);
+    const { page, page_size, shop_id, search } = parse_to_int(params);
     const skip = (page - 1) * page_size;
     const total = await this.prisma.promotion.count();
     const data = await this.prisma.promotion.findMany({
@@ -21,7 +22,12 @@ export class PromotionService {
         createdAt: 'desc',
       },
       where: {
-        shop_id,
+        AND: [
+          {
+            shop_id,
+          },
+          search ? { name: { contains: search } } : {},
+        ],
       },
     });
 

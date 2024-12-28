@@ -137,7 +137,7 @@ export class ShopService {
         }
     }
 
-    async getProductsShopById (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
+    async getProductsShopById (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC, search?: string): Promise<any> {
         const LIMIT = 30
         const skip = (page -1) * LIMIT
         let orderBy = {}
@@ -162,23 +162,37 @@ export class ShopService {
                 skip: skip,
                 take: LIMIT,
                 where: {
-                    shop_id: shopId
+                    AND: [
+                        { shop_id: shopId },
+                        search ? {
+                            OR: [
+                                { name: { contains: search, mode: 'insensitive' } },
+                                { product_code: { contains: search, mode: 'insensitive' } },
+                                { note: { contains: search, mode: 'insensitive' } }
+                            ]
+                        } : {}
+                    ]
                 },
-                orderBy: orderBy,
+                orderBy: {createdAt: 'desc'},
                 include: {
                     variations: true,
                 }
             }),
             this.prisma.product.count({
                 where: {
-                    shop_id: shopId
-                },
+                    AND: [
+                        { shop_id: shopId },
+                        search ? {
+                            OR: [
+                                { name: { contains: search, mode: 'insensitive' } },
+                                { product_code: { contains: search, mode: 'insensitive' } },
+                                { note: { contains: search, mode: 'insensitive' } }
+                            ]
+                        } : {}
+                    ]
+                }
             })
-        ]) 
-
-        // order by revenue
-
-        // order by profit
+        ])
 
         return { products, totalCount }
     }
@@ -533,7 +547,7 @@ export class ShopService {
         }
     }
 
-    async getCustomers (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC): Promise<any> {
+    async getCustomers (shopId: number, page: number, sortBy: SortBy = SortBy.CREATED_AT_DESC, search?: string): Promise<any> {
         try {
             const LIMIT = 30
             const skip = (page -1) * LIMIT
@@ -565,17 +579,27 @@ export class ShopService {
                     skip,
                     take: LIMIT,
                     where: {
-                        shopcustomers: {
-                            some: { shop_id: shopId }
-                        }
+                        AND: [
+                            { shopcustomers: { some: { shop_id: shopId } } },
+                            search ? {
+                                OR: [
+                                    { name: { contains: search, mode: 'insensitive' } },
+                                    { email: { contains: search, mode: 'insensitive' } },
+                                    { phone_number: { contains: search, mode: 'insensitive' } }
+                                ]
+                            } : {}
+                        ]
                     },
                     orderBy: orderBy
                 }),
                 this.prisma.customer.count({
                     where: {
-                        shopcustomers: {
-                            some: { shop_id: shopId }
-                        }
+                        shopcustomers: { some: { shop_id: shopId } },
+                        OR: [
+                            { name: { contains: search, mode: 'insensitive' } },
+                            { email: { contains: search, mode: 'insensitive' } },
+                            { phone_number: { contains: search, mode: 'insensitive' } }
+                        ]
                     },
                 })
             ]) 
@@ -620,14 +644,16 @@ export class ShopService {
                         {
                             OR: [
                                 { name: { contains: searchKey, mode: 'insensitive' } },
-                                { product_code: { contains: searchKey, mode: 'insensitive' } }
+                                { product_code: { contains: searchKey, mode: 'insensitive' } },
+                                {variations: { some: { variation_code: { contains: searchKey, mode: 'insensitive' } } } }
                             ]
                         }
                     ]
                 },
                 include: {
                     // shop: true,
-                    categories: true
+                    categories: true,
+                    variations: true
                 },
                 orderBy: {
                     name: 'asc'

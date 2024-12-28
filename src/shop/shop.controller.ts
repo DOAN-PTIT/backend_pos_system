@@ -139,8 +139,8 @@ export class ShopController {
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post('products/:shopId')
     async getProducts (@Param('shopId') shopId: number, @Query() getProductsDto: GetProductsDto): Promise<any> {
-        const { page, sortBy } = getProductsDto
-        return await this.shopService.getProductsShopById(shopId, page, sortBy);
+        const { page, sortBy, search } = getProductsDto
+        return await this.shopService.getProductsShopById(shopId, page, sortBy, search);
     }
 
     @Roles(Role.Admin, Role.User)
@@ -297,8 +297,8 @@ export class ShopController {
     @RolesShop(RoleShop.Owner, RoleShop.Admin)
     @Get(':shopId/customer/all')
     async getCustomer (@Param('shopId') shopId: number, @Query() getCustomersDto: GetCustomersDto): Promise<any> {
-        const { page, sortBy } = getCustomersDto
-        return await this.shopService.getCustomers(shopId, page, sortBy);
+        const { page, sortBy, search } = getCustomersDto
+        return await this.shopService.getCustomers(shopId, page, sortBy, search);
     }
 
     @Roles(Role.Admin, Role.User)

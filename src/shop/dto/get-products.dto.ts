@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsEnum } from "class-validator";
+import { IsNotEmpty, IsNumber, IsEnum, IsString } from "class-validator";
 import { SortBy } from "src/utils/enum/sort-option.enum";
 import { Transform } from 'class-transformer';
 
@@ -10,4 +10,7 @@ export class GetProductsDto {
 
     @IsEnum(SortBy)
     sortBy: SortBy
+
+    @IsString()
+    search: string = "";
 }
