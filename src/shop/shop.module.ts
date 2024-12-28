@@ -14,6 +14,7 @@ import { PromotionService } from 'src/promotion/promotion.service';
 import { SupplierService } from 'src/supplier/supplier.service';
 import { PurchaseService } from 'src/purchase/purchase.service';
 import { DebtService } from 'src/debt/debt.service';
+import { ShopPartnerService } from 'src/shop-partner/partner.service';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { DebtService } from 'src/debt/debt.service';
     SupplierService,
     PurchaseService,
     DebtService,
+    ShopPartnerService,
   ],
   controllers: [ShopController],
   exports: [ShopRepository],

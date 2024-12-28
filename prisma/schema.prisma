@@ -55,6 +55,7 @@ model Shop {
   suppliers     Supplier[]
   purchase      Purchases[]
   debts         Debt[]
+  shop_delivery_company ShopDeliveryCompany[]
 }
 
 model ShopSetting {
@@ -286,4 +287,21 @@ model Debt {
   purchase       Purchases? @relation(fields: [purchase_id], references: [id], onDelete: SetNull)
   shop_id        Int?
   shop           Shop?      @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+}
+
+model DeliveryCompany {
+  id Int @id @default(autoincrement())
+  name String
+  image String
+  shop_delivery_company ShopDeliveryCompany[]
+}
+
+model ShopDeliveryCompany {
+  id Int @id @default(autoincrement())
+  price Int
+  is_active Boolean?
+  shop_id Int? 
+  shop           Shop?      @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  delivery_company_id Int?
+  delivery_company           DeliveryCompany?      @relation(fields: [delivery_company_id], references: [id], onDelete: SetNull)
 }

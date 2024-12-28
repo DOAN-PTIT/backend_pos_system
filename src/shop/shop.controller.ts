@@ -43,6 +43,7 @@ import { SupplierService } from 'src/supplier/supplier.service';
 import { PurchaseService } from 'src/purchase/purchase.service';
 import { DebtService } from 'src/debt/debt.service';
 import { UpdateCustomerDto } from 'src/customer/dto/update-customer.dto';
+import { ShopPartnerService } from 'src/shop-partner/partner.service';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -57,7 +58,8 @@ export class ShopController {
         private promotionService: PromotionService,
         private supplierService: SupplierService,
         private purchaseService: PurchaseService,
-        private debtService: DebtService
+        private debtService: DebtService,
+        private shopParterService: ShopPartnerService
     ) {}
 
     // Shop general
@@ -533,6 +535,42 @@ export class ShopController {
     ) {
         const { month = undefined, year } = query
         return this.shopService.getRevenueStatsByMonth(shopId, year, month)
+    }
+
+    // PARTNER PAGE API
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @Get(':shopId/shop-partner/non-active')
+    async getNonActivePartners (@Param('shopId') shopId: number) {
+        return await this.shopParterService.getNonActivePartners(shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @Get(':shopId/shop-partner/active')
+    async getActivePartners (@Param('shopId') shopId: number) {
+        return await this.shopParterService.getActivePartners(shopId)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @Post(':shopId/shop-partner/:shopPartner/active')
+    async handleActivePartner (@Param('shopId') shopId: number, @Param("shopPartner") delivery_company_id: number, @Body() params: any) {
+        return await this.shopParterService.handleActivePartner({ ...params, shop_id: shopId, delivery_company_id })
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @Post(':shopId/shop-partner/:shopPartner/non-active')
+    async handleNonActivePartner (@Param('shopId') shopId: number, @Param("shopPartner") shop_delivery_company_id: number) {
+        return await this.shopParterService.handleNonActivePartner(shop_delivery_company_id)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @Post(':shopId/shop-partner/:shopPartner/update-price')
+    async updatePrice (@Param('shopId') shopId: number, @Param("shopPartner") shop_delivery_company_id: number, @Body() params: any) {
+        return await this.shopParterService.updatePrice({ ...params, shop_delivery_company_id, shop_id: shopId })
     }
 
 }
