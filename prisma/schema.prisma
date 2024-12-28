@@ -37,24 +37,24 @@ model User {
 }
 
 model Shop {
-  id            Int            @id @default(autoincrement())
-  name          String
-  avatar        String
-  currency      String         @default("VND")
-  description   String?
-  fb_shop_id    String?
-  is_deleted    Boolean        @default(false)
-  updatedAt     DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
-  createdAt     DateTime       @default(now()) @db.Timestamptz(6)
-  shopusers     ShopUser[]
-  promotions    Promotion[]
-  products      Product[]
-  shopsetting   ShopSetting?
-  shopcustomers ShopCustomer[]
-  orders        Order[]
-  suppliers     Supplier[]
-  purchase      Purchases[]
-  debts         Debt[]
+  id                    Int                   @id @default(autoincrement())
+  name                  String
+  avatar                String
+  currency              String                @default("VND")
+  description           String?
+  fb_shop_id            String?
+  is_deleted            Boolean               @default(false)
+  updatedAt             DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt             DateTime              @default(now()) @db.Timestamptz(6)
+  shopusers             ShopUser[]
+  promotions            Promotion[]
+  products              Product[]
+  shopsetting           ShopSetting?
+  shopcustomers         ShopCustomer[]
+  orders                Order[]
+  suppliers             Supplier[]
+  purchase              Purchases[]
+  debts                 Debt[]
   shop_delivery_company ShopDeliveryCompany[]
 }
 
@@ -73,15 +73,15 @@ model ShopSetting {
 }
 
 model ShopUser {
-  id        Int      @id @default(autoincrement())
-  role      String   @default("admin")
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  id        Int         @id @default(autoincrement())
+  role      String      @default("admin")
+  createdAt DateTime    @default(now()) @db.Timestamptz(6)
   user_id   Int?
   shop_id   Int?
-  user      User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
-  shop      Shop?    @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  user      User?       @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  shop      Shop?       @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   orders    Order[]
-  purchase Purchases[]
+  purchase  Purchases[]
 }
 
 model Product {
@@ -248,18 +248,18 @@ model Purchases {
   shipping_fee Int?
   discount     Int?
   total_price  Int?
-  created_at    DateTime       @default(now()) @db.Timestamptz(6)
+  created_at   DateTime       @default(now()) @db.Timestamptz(6)
   note         String?
   shop_id      Int?
   status       Int            @default(0)
-  description String?
+  description  String?
   shop         Shop?          @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   items        PurchaseItem[]
   supplier_id  Int?
   supplier     Supplier?      @relation(fields: [supplier_id], references: [id], onDelete: SetNull)
   debt         Debt[]
   shop_user_id Int?
-  shop_user ShopUser?  @relation(fields: [shop_user_id], references: [id], onDelete: SetNull)
+  shop_user    ShopUser?      @relation(fields: [shop_user_id], references: [id], onDelete: SetNull)
 }
 
 model PurchaseItem {
@@ -277,8 +277,8 @@ model Debt {
   name           String
   purchase_date  DateTime?  @default(now()) @db.Timestamptz(6)
   deal_date      DateTime?  @default(now()) @db.Timestamptz(6)
-  created_at      DateTime?  @default(now()) @db.Timestamptz(6)
-  description String?
+  created_at     DateTime?  @default(now()) @db.Timestamptz(6)
+  description    String?
   money_must_pay Int
   status         Int?       @default(0)
   supplier_id    Int?
@@ -290,18 +290,18 @@ model Debt {
 }
 
 model DeliveryCompany {
-  id Int @id @default(autoincrement())
-  name String
-  image String
+  id                    Int                   @id @default(autoincrement())
+  name                  String
+  image                 String
   shop_delivery_company ShopDeliveryCompany[]
 }
 
 model ShopDeliveryCompany {
-  id Int @id @default(autoincrement())
-  price Int
-  is_active Boolean?
-  shop_id Int? 
-  shop           Shop?      @relation(fields: [shop_id], references: [id], onDelete: SetNull)
+  id                  Int              @id @default(autoincrement())
+  price               Int
+  is_active           Boolean?
+  shop_id             Int?
+  shop                Shop?            @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   delivery_company_id Int?
-  delivery_company           DeliveryCompany?      @relation(fields: [delivery_company_id], references: [id], onDelete: SetNull)
+  delivery_company    DeliveryCompany? @relation(fields: [delivery_company_id], references: [id], onDelete: SetNull)
 }
