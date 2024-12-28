@@ -23,7 +23,7 @@ export class SupplierService {
     });
 
     if (existSupplier) {
-        throw new BadRequestException('Nhà cung cấp đã tồn tại');
+      throw new BadRequestException('Nhà cung cấp đã tồn tại');
     }
 
     return await this.prisma.supplier.create({
@@ -39,12 +39,32 @@ export class SupplierService {
   }
 
   async getListSupplier(params: any): Promise<any> {
-    const { shop_id, page, page_size } = parse_to_int(params);
+    const { shop_id, page, page_size, search } = parse_to_int(params);
     const skip = (page - 1) * page_size;
     const take = page_size;
+    const searchCondition: any = [
+      {
+        name: { contains: search, mode: 'insensitive' },
+      },
+      {
+        supplier_code: { contains: search, mode: 'insensitive' },
+      },
+      {
+        phone_number: { contains: search, mode: 'insensitive' },
+      },
+    ];
     const suppliers = await this.prisma.supplier.findMany({
       where: {
-        shop_id,
+        AND: [
+          {
+            shop_id,
+          },
+          search
+            ? {
+                OR: searchCondition,
+              }
+            : {},
+        ],
       },
       skip,
       take,
@@ -52,7 +72,16 @@ export class SupplierService {
 
     const total_entries = await this.prisma.supplier.count({
       where: {
-        shop_id,
+        AND: [
+          {
+            shop_id,
+          },
+          search
+            ? {
+                OR: searchCondition,
+              }
+            : {},
+        ],
       },
     });
 

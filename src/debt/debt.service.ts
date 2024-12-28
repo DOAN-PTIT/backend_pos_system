@@ -10,13 +10,24 @@ export class DebtService {
     params: {
       page_size: number;
       page: number;
+      search?: string;
     },
     shop_id: number,
   ): Promise<any> {
-    const { page_size, page } = parse_to_int(params);
+    const { page_size, page, search } = parse_to_int(params);
+    const searchCondition: any = [
+      { name: { contains: search, mode: 'insensitive' } },
+      { supplier: { name: { contains: search, mode: 'insensitive' } } },
+      { description: { contains: search, mode: 'insensitive' } },
+    ];
     const debts = await this.prisma.debt.findMany({
       where: {
-        shop_id,
+        AND: [
+          {
+            shop_id,
+          },
+          search ? { OR: searchCondition } : {},
+        ],
       },
       take: page_size,
       skip: page_size * (page - 1),
@@ -31,7 +42,12 @@ export class DebtService {
     });
     const total_entries = await this.prisma.debt.count({
       where: {
-        shop_id,
+        AND: [
+          {
+            shop_id,
+          },
+          search ? { OR: searchCondition } : {},
+        ],
       },
     });
 
