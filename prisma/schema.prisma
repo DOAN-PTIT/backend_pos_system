@@ -115,7 +115,7 @@ model Variation {
   image               String
   amount              Int
   barcode             String         @unique
-  variation_code      String         @unique
+  variation_code      String         
   price_at_counter    Int
   last_imported_price Int?
   updatedAt           DateTime       @default(now()) @updatedAt @db.Timestamptz(6)

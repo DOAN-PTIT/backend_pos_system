@@ -31,4 +31,8 @@ export class CreateVariationDto {
 
     @IsOptional()
     last_imported_price?: any
+
+    @IsOptional()
+    @IsString()
+    image?: string
 }

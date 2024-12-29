@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { parse_to_int } from 'src/utils/tools';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -24,36 +25,57 @@ export class ProductService {
     });
   }
 
-  async updateProduct(product_id: number, shop_id: number, params: any) {
-    const { variations, id, ...product } = params;
-    const newProduct = await this.prisma.product.update({
-      where: {
-        id: product_id,
-        shop_id,
-      },
-      data: product,
-    });
+    async updateProduct(updateProductDto: UpdateProductDto) {
+        const foundProduct = await this.prisma.product.findUnique({
+            where: { id: updateProductDto.id }
+        })
+        if (!foundProduct) {
+            throw new BadRequestException('Product not found')
+        }
 
-    // remove all variations, then add new variations
-    await this.prisma.variation.deleteMany({
-      where: {
-        product_id,
-      },
-    });
+        const updatedProduct = await this.prisma.product.update({
+            where: { id: updateProductDto.id },
+            data: {
+                name: updateProductDto.name ?? foundProduct.name,
+                description: updateProductDto.description ?? foundProduct.description,
+                note: updateProductDto.note ?? foundProduct.note,
+                product_code: updateProductDto.product_code ?? foundProduct.product_code,
+                categories_id: updateProductDto.categories_id ?? foundProduct.categories_id
+            }
+        })
 
-    if (variations?.length > 0) {
-      const newVariations = variations.map((v) => {
-        return parse_to_int({
-          ...v,
-          product_id,
-        });
-      });
+        const variations = updateProductDto.variations
+        const updatedVariations = await Promise.all(
+            variations.map(async (variation) => {
+                // filter remove object field null or undefined
+                const {
+                    createdAt,
+                    updatedAt,
+                    ...filteredData
+                } = Object.fromEntries(
+                    Object.entries(variation).filter(([_, value]) => value !== undefined && value !== null)
+                );
 
-      await this.prisma.variation.createMany({
-        data: newVariations,
-      });
+                return this.prisma.variation.update({
+                    where: { id: variation.id },
+                    data: filteredData
+                })
+            })
+        )
+
+        // remove variation
+        const delete_variation_ids = updateProductDto.delete_variation_ids
+        await Promise.all(
+            delete_variation_ids.map(async (id) => {
+                return this.prisma.variation.delete({
+                    where: { id }
+                })
+            })
+        )
+
+        return {
+            ...updatedProduct,
+            variations: updatedVariations
+        }
     }
-
-    return newProduct;
-  }
 }

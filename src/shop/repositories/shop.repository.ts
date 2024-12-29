@@ -38,6 +38,9 @@ export class ShopRepository {
                     },
                   },
                 },
+                orderBy: {
+                    createdAt: 'asc'
+                }
             })
         } catch (err) {
             console.error(err)

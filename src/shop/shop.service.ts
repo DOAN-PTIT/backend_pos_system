@@ -857,12 +857,13 @@ export class ShopService {
     async createVariation (
         shopId: number, 
         product_id: number,
-        image: Express.Multer.File | undefined,
         createVariationDto: CreateVariationDto
     ): Promise<any> {
         try {
             const { 
-                retail_price, amount, barcode, price_at_counter, variation_code, image_url_fb
+                retail_price, amount, barcode, 
+                price_at_counter, variation_code, 
+                image_url_fb, image, last_imported_price
             } = createVariationDto
 
             const foundProduct = await this.prisma.product.findFirst({
@@ -871,15 +872,9 @@ export class ShopService {
             if (!foundProduct) throw new BadRequestException('Product not found')
 
             // get avatar url cloud
-            let imageUrl:any
+            let imageUrl:string
             if (image && !image_url_fb) {
-                const avatarResponse = await this.cloudinary.uploadImage(image)
-                .catch(() => {
-                    console.log('Invalid file type')
-                    throw new BadRequestException('Invalid file type');
-                })
-                
-                imageUrl = avatarResponse.url
+                imageUrl = image
             } 
 
             if (!image && image_url_fb) {
@@ -898,6 +893,7 @@ export class ShopService {
                     price_at_counter, 
                     product_id, 
                     variation_code,
+                    last_imported_price,
                     image: imageUrl
                 } as Prisma.VariationUncheckedCreateInput
             })

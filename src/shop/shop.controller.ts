@@ -44,6 +44,7 @@ import { PurchaseService } from 'src/purchase/purchase.service';
 import { DebtService } from 'src/debt/debt.service';
 import { UpdateCustomerDto } from 'src/customer/dto/update-customer.dto';
 import { ShopPartnerService } from 'src/shop-partner/partner.service';
+import { UpdateProductDto } from 'src/product/dto/update-product.dto';
 
 @Controller('shop')
 @UseGuards(AuthGuard, RolesGuard, RolesShopGuard)
@@ -171,13 +172,11 @@ export class ShopController {
 
     @Roles(Role.Admin, Role.User)
     @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
-    @Post(':shopId/product/:productId/update')
-    async updateProduct (
-        @Param('shopId') shopId: number, 
-        @Param('productId') productId: number,
-        @Body() updateProductDto: any
+    @Post(':shopId/product/update')
+    async updateProduct ( 
+        @Body() updateProductDto: UpdateProductDto
     ) {
-        return await this.productService.updateProduct(productId, shopId, updateProductDto)
+        return await this.productService.updateProduct(updateProductDto)
     }
 
     // Variations
@@ -196,9 +195,8 @@ export class ShopController {
         @Param('shopId') shopId: number, 
         @Param('productId') product_id: number,
         @Body() createVariationDto: CreateVariationDto,
-        @UploadedFile() image?: Express.Multer.File
     ): Promise<any> {
-        return await this.shopService.createVariation(shopId, product_id, image, createVariationDto);
+        return await this.shopService.createVariation(shopId, product_id, createVariationDto);
     }
 
     // Employees
