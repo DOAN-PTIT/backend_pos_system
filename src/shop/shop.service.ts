@@ -1044,7 +1044,7 @@ export class ShopService {
                 received_orders: periodData?.received_orders || 0,
                 returned_orders: periodData?.returned_orders || 0,
                 total_items_cost: totalImportCost?.total_import_cost || 0,
-                total_profit: (periodData?.revenue || 0) - (totalImportCost?.total_import_cost || 0),
+                total_profit: (periodData?.revenue || 0) - (totalImportCost?.total_import_cost || 0) - (periodData?.delivery_cost || 0) - (periodData?.delivery_cost_shop || 0),
                 total_discount: periodData?.total_discount || 0,
                 sales: periodData?.sales || 0,
                 total_orders: periodData?.total_orders || 0,
