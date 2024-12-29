@@ -119,13 +119,14 @@ export class OrderService {
 
   async updateOrder(id: number, shop_id: number, updateOrder: any) {
     delete updateOrder.id;
+    delete updateOrder.shop_id;
     const order = await this.prisma.order.findUnique({
       where: {
         id,
         shop_id,
       },
     });
-    if (updateOrder.status) {
+    if (updateOrder.status && updateOrder.is_update_status) {
       return await this.prisma.order.update({
         where: {
           id,
@@ -136,8 +137,37 @@ export class OrderService {
         },
       });
     }
-    const { orderitems, shopuser, customer, add_customer, ...newOrder } =
-      updateOrder;
+    const {
+      orderitems,
+      customer,
+      add_customer,
+      shop_delivery_company_id,
+      promotion_id,
+      customer_id,
+      shopuser_id,
+      createdAt,
+      ...newOrder
+    } = updateOrder;
+    const findCustomer = await this.prisma.customer.findUnique({
+      where: {
+        id: add_customer?.id || customer_id,
+        shopcustomers: { some: { shop_id } },
+      },
+    });
+    const findShopUser = await this.prisma.shopUser.findUnique({
+      where: { id: shopuser_id, shop_id },
+    });
+    const findPromotion = promotion_id
+      ? await this.prisma.promotion.findUnique({
+          where: { id: promotion_id, shop_id },
+        })
+      : null;
+    const findShopDeliveryCompany = shop_delivery_company_id
+      ? await this.prisma.shopDeliveryCompany.findUnique({
+          where: { id: shop_delivery_company_id, shop_id },
+        })
+      : null;
+
     const orderUpdate = await this.prisma.order.update({
       where: {
         id,
@@ -145,7 +175,33 @@ export class OrderService {
       },
       data: {
         ...newOrder,
-        customer_id: add_customer ? add_customer?.id : order.customer_id,
+        createdAt: new Date(createdAt),
+        customer: findCustomer
+          ? { connect: { id: findCustomer.id } }
+          : {
+              create: {
+                name: add_customer.name,
+                phone_number: add_customer.phone_number,
+                email: add_customer.email,
+                address: add_customer.address,
+                shopcustomers: {
+                  create: {
+                    shop_id,
+                  },
+                },
+              },
+            },
+        shopuser: {
+          connect: {
+            id: findShopUser.id,
+          },
+        },
+        shop_delivery_company: findShopDeliveryCompany
+          ? { connect: { id: findShopDeliveryCompany.id } }
+          : undefined,
+        promotion: findPromotion
+          ? { connect: { id: findPromotion.id } }
+          : undefined,
       },
     });
 
