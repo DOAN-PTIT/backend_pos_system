@@ -85,8 +85,11 @@ export class CreateOrderDto {
     shopuser_id: number             // id nhân viên 
 
     @IsOptional()
-    promotion: any
+    promotion_id: any
 
     @IsNumber()
     total_discount: number = 0
+
+    @IsOptional()
+    shop_delivery_company_id: any
 }

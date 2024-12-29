@@ -172,6 +172,8 @@ model Order {
   shop                   Shop?       @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   promotion_id           Int?
   promotion              Promotion?  @relation(fields: [promotion_id], references: [id], onDelete: SetNull)
+  shop_delivery_company_id Int?
+  shop_delivery_company ShopDeliveryCompany? @relation(fields: [shop_delivery_company_id], references: [id], onDelete: SetNull)
 }
 
 model OrderItem {
@@ -304,4 +306,5 @@ model ShopDeliveryCompany {
   shop                Shop?            @relation(fields: [shop_id], references: [id], onDelete: SetNull)
   delivery_company_id Int?
   delivery_company    DeliveryCompany? @relation(fields: [delivery_company_id], references: [id], onDelete: SetNull)
+  order Order[]
 }

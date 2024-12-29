@@ -723,7 +723,8 @@ export class ShopService {
                 note, delivery_address, delivery_company, delivery_cost, delivery_cost_shop,
                 estimated_delivery, tracking_number, paid, total_cost,
                 recipient_name, recipient_phone_number, createdAt, products_order,
-                shopuser_id, add_customer, surcharge, at_counter, promotion, total_discount
+                shopuser_id, add_customer, surcharge, at_counter, promotion_id, total_discount,
+                shop_delivery_company_id
             } = createOrderDto
 
             const shopUser = await this.prisma.shopUser.findUnique({
@@ -764,8 +765,9 @@ export class ShopService {
                     createdAt: new Date(createdAt), 
                     customer_id: newOrderCustomerId,
                     shop_id: shopId,
-                    promotion_id: promotion ? promotion.id : null,
-                    total_discount
+                    promotion_id: promotion_id || null,
+                    total_discount,
+                    shop_delivery_company_id: parseInt(shop_delivery_company_id)
                 }
             })
             // create orderItem

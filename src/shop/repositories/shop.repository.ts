@@ -53,6 +53,16 @@ export class ShopRepository {
                 where: {id: shopId},
                 include: {
                     suppliers: true,
+                    shop_delivery_company: {
+                        include: {
+                            delivery_company: true
+                        }
+                    },
+                    shopusers: {
+                        include: {
+                            user: true
+                        }
+                    }
                 }
             })
 
