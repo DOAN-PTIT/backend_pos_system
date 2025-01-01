@@ -176,6 +176,11 @@ export class ShopService {
                 orderBy: {createdAt: 'desc'},
                 include: {
                     variations: true,
+                    suppliers_products: {
+                        include: {
+                            supplier: true
+                        }
+                    }
                 }
             }),
             this.prisma.product.count({
@@ -319,7 +324,8 @@ export class ShopService {
             description = null, 
             note, 
             product_code = null,
-            categories_id = null
+            categories_id = null,
+            suppliers_products_ids = []
         } = createProductDto
 
         try {
@@ -331,6 +337,14 @@ export class ShopService {
             })
             if (foundProductByCode) throw new BadRequestException('Product_code existed')
 
+            const foundSupplier = await this.prisma.supplier.findMany({
+                where: {
+                    id: {
+                        in: suppliers_products_ids
+                    }
+                }
+            })
+
             const newProduct = await this.prisma.product.create({
                 data: {
                     name,
@@ -341,6 +355,18 @@ export class ShopService {
                     categories_id,
                 }
             })
+
+            // create supplier_products
+            await Promise.all(
+                foundSupplier.map(async (supplier) => {
+                    return this.prisma.supplierProducts.create({
+                        data: {
+                            supplier_id: supplier.id,
+                            product_id: newProduct.id
+                        }
+                    })
+                })
+            )
 
             return newProduct
         } catch (err) {
@@ -890,10 +916,10 @@ export class ShopService {
                     retail_price, 
                     amount, 
                     barcode, 
-                    price_at_counter, 
+                    price_at_counter: parseInt(price_at_counter as any || "0"), 
                     product_id, 
                     variation_code,
-                    last_imported_price,
+                    last_imported_price: parseInt(last_imported_price || "0"),
                     image: imageUrl
                 } as Prisma.VariationUncheckedCreateInput
             })

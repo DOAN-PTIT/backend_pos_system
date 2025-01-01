@@ -15,6 +15,11 @@ export class ProductService {
       },
       include: {
         variations: true,
+        suppliers_products: {
+            include: {
+                supplier: true
+            }
+        }
       },
     });
   }
@@ -33,6 +38,15 @@ export class ProductService {
             throw new BadRequestException('Product not found')
         }
 
+        // find supplier
+        const suppliers_products = await this.prisma.supplier.findMany({
+            where: {
+                id: {
+                    in: updateProductDto.suppliers_products_ids
+                }
+            }
+        })
+
         const updatedProduct = await this.prisma.product.update({
             where: { id: updateProductDto.id },
             data: {
@@ -40,9 +54,29 @@ export class ProductService {
                 description: updateProductDto.description ?? foundProduct.description,
                 note: updateProductDto.note ?? foundProduct.note,
                 product_code: updateProductDto.product_code ?? foundProduct.product_code,
-                categories_id: updateProductDto.categories_id ?? foundProduct.categories_id
+                categories_id: updateProductDto.categories_id ?? foundProduct.categories_id,
             }
         })
+
+        if (updatedProduct) {
+            await this.prisma.supplierProducts.deleteMany({
+                where: {
+                        product_id: updatedProduct.id
+                }
+                }) 
+
+            // add new supplier product
+            await Promise.all(
+                suppliers_products.map(async (supplier) => {
+                    return this.prisma.supplierProducts.create({
+                        data: {
+                            product_id: updatedProduct.id,
+                            supplier_id: supplier.id
+                        }
+                    })
+                })
+            )
+        }
 
         const variations = updateProductDto.variations
         const updatedVariations = await Promise.all(
@@ -56,22 +90,33 @@ export class ProductService {
                     Object.entries(variation).filter(([_, value]) => value !== undefined && value !== null)
                 );
 
-                return this.prisma.variation.update({
-                    where: { id: variation.id },
-                    data: filteredData
-                })
+                if (variation.id) {
+                    return this.prisma.variation.update({
+                        where: { id: variation.id },
+                        data: filteredData
+                    })
+                } else {
+                    return this.prisma.variation.create({
+                        data: {
+                            ...filteredData as any,
+                            product_id: updateProductDto.id as number
+                        }
+                    })
+                }
             })
         )
 
         // remove variation
         const delete_variation_ids = updateProductDto.delete_variation_ids
-        await Promise.all(
-            delete_variation_ids.map(async (id) => {
-                return this.prisma.variation.delete({
-                    where: { id }
+        if (delete_variation_ids && delete_variation_ids?.length > 0) {
+            await Promise.all(
+                delete_variation_ids.map(async (id) => {
+                    return this.prisma.variation.delete({
+                        where: { id }
+                    })
                 })
-            })
-        )
+            )
+        }
 
         return {
             ...updatedProduct,
