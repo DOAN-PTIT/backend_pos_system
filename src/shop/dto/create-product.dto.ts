@@ -21,4 +21,7 @@ export class CreateProductDto {
     @IsNumber()
     @IsOptional()
     categories_id: number
+
+    @IsOptional()
+    suppliers_products_ids?: number[]
 }

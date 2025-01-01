@@ -84,13 +84,16 @@ export class UpdateProductDto {
 
     @IsString()
     @IsOptional()
-    createdAt?: string;
+    createdAt?: any;
 
     @IsString()
     @IsOptional()
-    updatedAt?: string;
+    updatedAt?: any;
 
     @IsArray()
     @IsOptional()
     delete_variation_ids?: number[]
+
+    @IsOptional()
+    suppliers_products_ids?: number[]
 }
