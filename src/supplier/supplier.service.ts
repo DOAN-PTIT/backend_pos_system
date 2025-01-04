@@ -66,6 +66,10 @@ export class SupplierService {
             : {},
         ],
       },
+      include: {
+        debt: true,
+        purchases: true,
+      },
       skip,
       take,
     });

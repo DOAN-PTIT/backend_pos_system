@@ -116,6 +116,7 @@ export class PurchaseService {
           },
         },
         supplier: true,
+        debt: true,
         shop_user: {
           include: {
             user: true,
@@ -176,6 +177,7 @@ export class PurchaseService {
         total_price: parseInt(purchase.total_price),
         supplier: supplier ? { connect: { id: supplier.id } } : undefined,
         shop_user: shop_user ? { connect: { id: shop_user.id } } : undefined,
+        debt: purchase.debt ? { set: purchase.debt } : [],
       },
     });
 
