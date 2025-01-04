@@ -339,7 +339,7 @@ export class ShopController {
 
     // Orders
     @Roles(Role.Admin, Role.User)
-    @RolesShop(RoleShop.Owner, RoleShop.Admin)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
     @Post(':shopId/order/create')
     async createOrder (@Param('shopId') shopId: number, @Body() createOrderDto: CreateOrderDto): Promise<any> {
 

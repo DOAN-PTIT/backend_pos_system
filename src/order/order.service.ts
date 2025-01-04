@@ -106,7 +106,7 @@ export class OrderService {
     });
 
     // parse promotion
-    if (order.promotion) {
+    if (order?.promotion) {
       order.promotion = {
         ...order.promotion,
         condition: JSON.parse(order.promotion.condition as string),
