@@ -32,10 +32,20 @@ export class ShopService {
     ) {}
 
     async getShopInfo (shopId: number): Promise<any> {
-        const shopInfo = await this.shopRepository.findShopById(shopId);
+        const fb_shop_id = shopId.toString()
+        if (shopId < 1000000) {
+            const shopInfo = await this.shopRepository.findShopById(shopId);
         if (!shopInfo) throw new BadRequestException('Shop not found or no logger exist')
 
         return shopInfo
+        } else {
+            const shopInfo = await this.prisma.shop.findFirst({
+                where: { fb_shop_id }
+            })
+            if (!shopInfo) throw new BadRequestException('Shop not found or no logger exist')
+
+            return shopInfo
+        }
     }
 
     async getListShop(userId: number) {
@@ -548,7 +558,7 @@ export class ShopService {
         try {
             const { name, email, gender , address, date_of_birth, phone_number, last_purchase } = addCustomerDto    
 
-            // check customer existed
+            // check customer existed 
             const foundCustomer = await this.prisma.customer.findFirst({
                 where: {
                     shopcustomers: {
@@ -567,9 +577,9 @@ export class ShopService {
                 data: {
                     name: name,
                     email: email,
-                    gender: gender,
+                    gender: gender ? gender : "MALE",
                     address: address,
-                    date_of_birth: new Date(date_of_birth),
+                    date_of_birth: date_of_birth ? new Date(date_of_birth) : null,
                     phone_number: phone_number,
                     last_purchase: last_purchase ? new Date(last_purchase) : null,
                 }

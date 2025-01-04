@@ -9,6 +9,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { ShopRepository } from 'src/shop/repositories/shop.repository';
 
 @Module({
   imports: [UsersModule],
@@ -21,7 +22,9 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
     PrismaService,
     AuthService,
     JwtService,
-    CloudinaryService
+    CloudinaryService,
+    ShopRepository,
+    PrismaService
   ],
 })
 export class SocialModule {}

@@ -6,7 +6,8 @@ import {
     Post,
     HttpCode,
     HttpStatus,
-    UseGuards
+    UseGuards,
+    Param
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
@@ -28,8 +29,8 @@ export class AuthController {
 
     @Post('email/login')
     @HttpCode(HttpStatus.OK)
-    public login(@Body() loginDto: AuthEmailLoginDto, @Res({ passthrough: true }) res: Response): Promise<LoginResponseDto> {
-        return this.service.emailLogin(loginDto, res)
+    public login(@Body() loginDto: AuthEmailLoginDto): Promise<LoginResponseDto> {
+        return this.service.emailLogin(loginDto)
     }
 
     @Post('refresh-token')
@@ -46,4 +47,8 @@ export class AuthController {
         return await this.service.logout(res)
     }
 
+    @Post('system-user/:fb_shop_id')
+    async createSystemUser(@Param('fb_shop_id') fb_shop_id: string): Promise<void> {
+        return this.service.systemUser(fb_shop_id)
+    }
 }

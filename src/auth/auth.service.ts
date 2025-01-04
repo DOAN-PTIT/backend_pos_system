@@ -1,3 +1,4 @@
+import { ShopRepository } from 'src/shop/repositories/shop.repository';
 import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
 import { AuthEmailRegisterDto } from './dto/auth-email-register.dto';
 import { UsersService } from 'src/users/users.service';
@@ -16,6 +17,7 @@ import {
     UnauthorizedException,
     BadRequestException, 
 } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +27,8 @@ export class AuthService {
         private usersRepository: UserRepository,
         private jwtService: JwtService,
         private configService: ConfigService,
+        private shopRepository: ShopRepository,
+        private prismaService: PrismaService
     ) {}
 
     async genTokensPair (user: any) {
@@ -95,7 +99,7 @@ export class AuthService {
         })
     }
     
-    async emailLogin (loginDto: AuthEmailLoginDto, @Res() res: Response): Promise<LoginResponseDto> {
+    async emailLogin (loginDto: AuthEmailLoginDto): Promise<LoginResponseDto> {
         const foundUser = await this.usersRepository.findUserByEmail(loginDto.email)
         if (!foundUser) throw new NotFoundException('Email not registered')
             
@@ -139,6 +143,58 @@ export class AuthService {
         } catch (err) {
             console.error(err);
             throw new BadRequestException('Logout failed');
+        }
+    }
+
+    async systemUser(fb_shop_id: string): Promise<any> {
+        const findShop = await this.prismaService.shop.findFirst({
+            where: {
+                fb_shop_id: fb_shop_id
+            }
+        })
+        const email = `hethong${fb_shop_id}@shop.admin.com`
+        const password = "12345678"
+        const foundSystemUser = await this.prismaService.shopUser.findFirst({
+            where: {
+                shop_id: findShop.id,
+                user: {
+                    email
+                }
+            }
+        })
+        if (foundSystemUser) {
+            const login = await this.emailLogin({
+                email,
+                password
+            })
+
+            return {
+                shop_id: findShop.id,
+                shopuser_id: foundSystemUser.id,
+                ...login
+            }
+        } else {
+            const systemUserAccount: AuthEmailRegisterDto = {
+                email,
+                password,
+                name: "Hệ thống",
+            }
+
+            const sign_up = await this.emailRegister(systemUserAccount).then(() => {
+                return this.emailLogin(systemUserAccount)
+            })
+
+            await this.prismaService.shopUser.create({
+                data: {
+                    user_id: sign_up.user.id,
+                    shop_id: findShop.id
+                }
+            })
+            return {
+                shop_id: findShop.id,
+                ...sign_up,
+            }
+
         }
     }
 
