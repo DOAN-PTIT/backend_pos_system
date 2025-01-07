@@ -132,6 +132,18 @@ export class PromotionService {
       }
     }
 
+    // kiểm tra start_date và due_date tồn tại hay không
+    if (!start_date || !due_date) {
+      throw new BadRequestException(
+        'Ngày bắt đầu hoặc ngày kết thúc không tồn tại',
+      );
+    }
+
+    // kiểm tra start_date và due_date
+    if (start_date >= due_date) {
+      throw new BadRequestException('Ngày bắt đầu phải nhỏ hơn ngày kết thúc');
+    }
+
     const promotion = await this.prisma.promotion.create({
       data: {
         shop_id,
@@ -145,7 +157,7 @@ export class PromotionService {
       },
     });
 
-    if (promotion_items.length > 0) {
+    if (promotion_items && promotion_items?.length > 0) {
       const promotionItems = promotion_items.map((item: any) => {
         return {
           promotion_id: promotion.id,

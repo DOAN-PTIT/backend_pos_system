@@ -751,8 +751,9 @@ export class ShopService {
                         { product: {shop_id: shopId} },
                         {
                             OR: [
-                                {product: { name: { contains: searchKey, mode: 'insensitive' } }},
-                                { variation_code: { contains: searchKey, mode: 'insensitive' } }
+                                { product: { name: { contains: searchKey, mode: 'insensitive' } }},
+                                { variation_code: { contains: searchKey, mode: 'insensitive' } },
+                                { product: { product_code: { contains: searchKey, mode: 'insensitive' } }}
                             ]
                         }
                     ]

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { CreateShopDto } from './dto/create-shop.dto';
 import { 
     Controller,
@@ -151,6 +152,13 @@ export class ShopController {
     @Get(':shopId/products/:searchKey')
     async searchProducts (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
         return await this.shopService.searchProducts(shopId, searchKey);
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/products/from-facebook-params/:searchKey')
+    async findProductsFromFacebookParams (@Param('shopId') shopId: number, @Param('searchKey') searchKey: string): Promise<any> {
+        return await this.productService.findProductsFromFacebookParams(shopId, searchKey);
     }
 
     @Roles(Role.Admin, Role.User)
@@ -571,4 +579,18 @@ export class ShopController {
         return await this.shopParterService.updatePrice({ ...params, shop_delivery_company_id, shop_id: shopId })
     }
 
+    // Categories
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Post(':shopId/category/create')
+    async createCategory (@Param('shopId') shopId: number, @Body() body: any) {
+        return await this.productService.createCategory(shopId, body)
+    }
+
+    @Roles(Role.Admin, Role.User)
+    @RolesShop(RoleShop.Owner, RoleShop.Admin, RoleShop.Employee)
+    @Get(':shopId/categories')
+    async getCategories () {
+        return await this.productService.getCategories()
+    }
 }
