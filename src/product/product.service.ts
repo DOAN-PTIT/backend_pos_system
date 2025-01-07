@@ -70,7 +70,7 @@ export class ProductService {
                 where: {
                         product_id: updatedProduct.id
                 }
-                }) 
+            }) 
 
             // add new supplier product
             await Promise.all(
@@ -181,5 +181,29 @@ export class ProductService {
 
     async getCategories() {
         return await this.prisma.categories.findMany()
+    }
+
+    async isProductCodeExisted (shop_id: number, product_code: string): Promise<boolean> {
+        const product = await this.prisma.product.findFirst({
+            where: { 
+                shop_id,
+                product_code 
+            }
+        })
+        if (!product) return false;
+
+        return true;
+    }
+
+    async isVariationCodeExisted (product_id: number, variation_code: string): Promise<boolean> {
+        const variation = await this.prisma.variation.findFirst({
+            where: { 
+                product_id,
+                variation_code
+            }
+        })
+        if (!variation) return false
+
+        return true
     }
 }

@@ -333,26 +333,18 @@ export class OrderService {
     const sevenDaysBefore = new Date(today);
     sevenDaysBefore.setDate(today.getDate() - 7);
 
-    const dataChart = await this.prisma.order.groupBy({
-      by: ['createdAt'],
-      where: {
-        shop_id: shop_id,
-        status: 4,
-        createdAt: {
-          gte: sevenDaysBefore,
-          lte: today,
-        },
-      },
-      _count: {
-        createdAt: true,
-      },
-      _sum: {
-        total_cost: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
+    const dataChart: any = await this.prisma.$queryRaw`
+      SELECT DATE("createdAt") AS "createdAt",
+        COUNT(*) AS "order_count",
+        SUM("total_cost") AS "total_cost"
+      FROM "Order"
+      WHERE "shop_id" = ${shop_id}
+        AND "status" = 4
+        AND "createdAt" BETWEEN ${sevenDaysBefore} AND ${today}
+      GROUP BY DATE("createdAt")
+      ORDER BY DATE("createdAt") ASC;
+    `;
+    console.log(dataChart)
 
     const sevenDates = [];
     let currentDate = new Date(sevenDaysBefore);
@@ -371,13 +363,7 @@ export class OrderService {
         year: 'numeric',
       });
 
-      labels.push(
-        date.toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-        }),
-      );
+      labels.push(dateKey);
 
       const found = dataChart.find((item) => {
         const itemDate = new Date(item.createdAt).toLocaleDateString('en-GB', {
@@ -385,10 +371,10 @@ export class OrderService {
           month: '2-digit',
           year: 'numeric',
         });
-        return itemDate === dateKey;
+        
+        return itemDate == dateKey; 
       });
-
-      data.push(found?._sum?.total_cost || 0);
+      data.push(Number(found?.total_cost) || 0);
     });
 
     return {
