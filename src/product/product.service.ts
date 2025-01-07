@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { parse_to_int } from 'src/utils/tools';
@@ -30,7 +31,7 @@ export class ProductService {
     });
   }
 
-    async updateProduct(updateProductDto: UpdateProductDto) {
+    async updateProduct(updateProductDto: any) {
         const foundProduct = await this.prisma.product.findUnique({
             where: { id: updateProductDto.id }
         })
@@ -47,6 +48,8 @@ export class ProductService {
             }
         })
 
+        const categories_id = updateProductDto.categories_id ?? foundProduct.categories_id;
+
         const updatedProduct = await this.prisma.product.update({
             where: { id: updateProductDto.id },
             data: {
@@ -54,7 +57,11 @@ export class ProductService {
                 description: updateProductDto.description ?? foundProduct.description,
                 note: updateProductDto.note ?? foundProduct.note,
                 product_code: updateProductDto.product_code ?? foundProduct.product_code,
-                categories_id: updateProductDto.categories_id ?? foundProduct.categories_id,
+                categories: categories_id ? {
+                    connect: {
+                        id: categories_id
+                    }
+                } : undefined,
             }
         })
 
@@ -122,6 +129,58 @@ export class ProductService {
             ...updatedProduct,
             variations: updatedVariations
         }
+    }
+
+    async findProductsFromFacebookParams(shop_id: number, searchKey: string = "") {
+        const listCode = searchKey?.split(';');
+        if (!listCode) {
+            return []
+        }
+
+        const variations = await this.prisma.variation.findMany({
+            where: {
+                product: {
+                    shop_id,
+                    product_code: {
+                        in: listCode.map((item) => item.split('-')[0].trim())
+                    }
+                },
+                variation_code: {
+                    in: listCode.map((item) => item.split('-')[1].trim())
+                }
+            },
+            include: {
+                product: true
+            }
+        })
+
+        return variations
+    }
+
+    async createCategory(shop_id: number, params: { name: string, description: string, product_code: string }) {
+        const product = await this.prisma.product.findFirst({
+            where: {
+                shop_id,
+                product_code: params.product_code
+            }
+        })
+        const category = await this.prisma.categories.create({
+            data: {
+                name: params.name,
+                description: params.description,
+                products: {
+                    connect: {
+                        id: product.id
+                    }
+                }
+            }
+        })
+
+        return category
+    }
+
+    async getCategories() {
+        return await this.prisma.categories.findMany()
     }
 
     async isProductCodeExisted (shop_id: number, product_code: string): Promise<boolean> {

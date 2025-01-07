@@ -126,17 +126,6 @@ export class OrderService {
         shop_id,
       },
     });
-    if (updateOrder.status && updateOrder.is_update_status) {
-      return await this.prisma.order.update({
-        where: {
-          id,
-          shop_id,
-        },
-        data: {
-          status: parse_to_int(updateOrder.status),
-        },
-      });
-    }
     const {
       orderitems,
       customer,
@@ -148,12 +137,34 @@ export class OrderService {
       createdAt,
       ...newOrder
     } = updateOrder;
-    const findCustomer = await this.prisma.customer.findUnique({
+    const findCustomer = await this.prisma.customer.findFirst({
       where: {
         id: add_customer?.id || customer_id,
         shopcustomers: { some: { shop_id } },
       },
     });
+
+    console.log(findCustomer);
+    if (updateOrder.status && updateOrder.is_update_status) {
+      if (updateOrder.status == 4) {
+        const newCustomer = await this.prisma.customer.update({
+          where: { id: findCustomer.id },
+          data: { last_purchase: new Date() },
+        });
+
+        console.log(newCustomer);
+      }
+      return await this.prisma.order.update({
+        where: {
+          id,
+          shop_id,
+        },
+        data: {
+          status: parse_to_int(updateOrder.status),
+        },
+      });
+    }
+
     const findShopUser = await this.prisma.shopUser.findUnique({
       where: { id: shopuser_id, shop_id },
     });
